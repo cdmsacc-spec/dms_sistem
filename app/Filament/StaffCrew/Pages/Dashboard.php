@@ -17,6 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Pages\Page;
+use Filament\Support\Enums\ActionSize;
 use Illuminate\Support\Carbon;
 
 class Dashboard extends \Filament\Pages\Dashboard
@@ -52,6 +53,7 @@ class Dashboard extends \Filament\Pages\Dashboard
     {
         return $form->schema([
             Section::make('Filter')
+                ->extraAttributes(['class' => 'section-filter-dashboard'])
                 ->schema([
                     TextInput::make('periode')
                         ->label('Periode')
@@ -65,6 +67,7 @@ class Dashboard extends \Filament\Pages\Dashboard
                         ->label('Reset Filter')
                         ->color('danger')
                         ->button()
+                        ->size(ActionSize::ExtraLarge)
                         ->action(function () use ($form) {
                             $form->fill([]);
                         }),

@@ -17,7 +17,7 @@ class ListCrewCandidates extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->label('Add Candidate')->color('info'),
+            Actions\CreateAction::make()->label('Add Candidate')->color('primary'),
         ];
     }
 }

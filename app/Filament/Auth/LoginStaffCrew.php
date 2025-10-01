@@ -31,7 +31,7 @@ class LoginStaffCrew extends Login
     protected function getAuthenticateFormAction(): Action
     {
         return Action::make('authenticate')
-            ->color('info')
+            ->color('primary')
              ->label('Login')
             ->submit('authenticate');
     }
@@ -45,7 +45,7 @@ class LoginStaffCrew extends Login
             ->autocomplete()
             ->autofocus()
             ->suffixIcon('heroicon-m-globe-alt')
-            ->suffixIconColor('info')
+            ->suffixIconColor('primary')
             ->extraInputAttributes(['tabindex' => 1]);
     }
     protected function getPasswordFormComponent(): Component

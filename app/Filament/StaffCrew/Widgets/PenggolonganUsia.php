@@ -47,6 +47,7 @@ class PenggolonganUsia extends ChartWidget
                 'label' => "Usia $kategori",
                 'data' => [$jumlah], // satu data per kategori
                 'backgroundColor' => $colors[$index],
+                'borderWidth' => 0,
             ];
         }
 

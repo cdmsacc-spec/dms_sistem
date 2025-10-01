@@ -58,14 +58,14 @@ class PieChartDashboard extends ChartWidget
             'datasets' => [
                 [
                     'backgroundColor' => [
-                        'rgba(254, 0, 4, 0.5)',   // merah transparan
-                        'rgba(244, 197, 11, 0.5)', // kuning transparan
-                        'rgba(16, 224, 0, 0.5)',  // hijau transparan
+                        '#EF4444',   // merah transparan
+                        '#F59E0B', // kuning transparan
+                        '#10B981',  // hijau transparan
                     ],
                     'borderColor' => [
-                        'rgba(254, 0, 4, 1)',   // merah solid
-                        'rgba(244, 197, 11, 1)', // kuning solid
-                        'rgba(16, 224, 0, 1)',  // hijau solid
+                        '#EF4444',   // merah transparan
+                        '#F59E0B', // kuning transparan
+                        '#10B981',  // hijau transparan
                     ],
                     'data' => [$expired, $near_expiry, $uptodate],
                 ],

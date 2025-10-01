@@ -31,11 +31,11 @@ class StaffDocumentPanelProvider extends PanelProvider
             ->path('staff_document')
             ->login(LoginStaffDocument::class)
             ->colors([
-                'info' => Color::hex('#3bc4ff'),
+               'info' => Color::hex('#3bc4ff'),
                 'warning' => Color::hex('#EDBC1C'),
                 'success' => Color::hex('#1CED23'),
                 'danger' => Color::hex('#ED1C1C'),
-                'primary' => Color::hex('#3bc4ff')
+                'primary' => Color::hex('#003366')
             ])
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarCollapsibleOnDesktop()

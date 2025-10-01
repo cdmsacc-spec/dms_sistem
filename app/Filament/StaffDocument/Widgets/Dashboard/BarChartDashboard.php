@@ -86,19 +86,19 @@ class BarChartDashboard extends ChartWidget
                 [
                     'label' => 'Expired',
                     'borderWidth' => 0,
-                    'backgroundColor' =>   'rgba(254, 0, 4, 0.5)',
+                    'backgroundColor' =>   '#EF4444',
                     'data' => $expiredData,
                 ],
                 [
                     'label' => 'NearExpiry',
                     'borderWidth' => 0,
-                    'backgroundColor' => 'rgba(255, 159, 64, 0.5)',
+                    'backgroundColor' => '#F59E0B',
                     'data' => $nearExpiryData,
                 ],
                 [
                     'label' => 'UpToDate',
                     'borderWidth' => 0,
-                    'backgroundColor' =>  'rgba(16, 224, 0, 0.5)',
+                    'backgroundColor' => '#10B981',
                     'data' => $upToDateData,
                 ],
             ],

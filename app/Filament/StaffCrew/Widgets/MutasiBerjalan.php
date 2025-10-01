@@ -45,6 +45,7 @@ class MutasiBerjalan extends ChartWidget
                     'label' => 'Jumlah Mutasi',
                     'data' => $seriesData,
                     'backgroundColor' => '#3bc4ff',
+                    'borderWidth' => 0,
                 ],
             ],
         ];
