@@ -50,10 +50,10 @@ jobs:
 
       - name: Package artifact
         run: |
-          # bersihkan folder yang tidak diperlukan
           rm -rf .git tests node_modules vendor
-          # pastikan hasil build (mis. Vite) sudah ada di public/build
-          tar -czf app.tar.gz ./
+          tar -czf ../app.tar.gz ./
+          mv ../app.tar.gz .
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
