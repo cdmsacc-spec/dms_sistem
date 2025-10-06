@@ -39,7 +39,7 @@ class LoginAdmin extends Login
 
     protected function getEmailFormComponent(): Component
     {
-        return TextInput::make('email')
+        return TextInput::make('email admin')
             ->label('Email')
             ->email()
             ->required()
