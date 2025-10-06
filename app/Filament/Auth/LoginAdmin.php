@@ -19,7 +19,7 @@ class LoginAdmin extends Login
     }
     public function getTitle(): string | Htmlable
     {
-        return 'Login';
+        return 'Logins';
     }
 
     protected function throwFailureValidationException(): never
