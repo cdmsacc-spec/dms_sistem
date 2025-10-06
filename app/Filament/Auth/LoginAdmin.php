@@ -19,7 +19,7 @@ class LoginAdmin extends Login
     }
     public function getTitle(): string | Htmlable
     {
-        return 'Logins';
+        return 'Login';
     }
 
     protected function throwFailureValidationException(): never
@@ -39,7 +39,7 @@ class LoginAdmin extends Login
 
     protected function getEmailFormComponent(): Component
     {
-        return TextInput::make('email admin')
+        return TextInput::make('email')
             ->label('Email')
             ->email()
             ->required()
