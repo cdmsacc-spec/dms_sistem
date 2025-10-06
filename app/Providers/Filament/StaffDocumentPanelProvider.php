@@ -26,12 +26,12 @@ class StaffDocumentPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->viteTheme('resources/css/filament/staff_crew/theme.css')
+
             ->id('staff_document')
             ->path('staff_document')
             ->login(LoginStaffDocument::class)
             ->colors([
-               'info' => Color::hex('#3bc4ff'),
+                'info' => Color::hex('#3bc4ff'),
                 'warning' => Color::hex('#EDBC1C'),
                 'success' => Color::hex('#1CED23'),
                 'danger' => Color::hex('#ED1C1C'),
@@ -66,6 +66,7 @@ class StaffDocumentPanelProvider extends PanelProvider
             ])->plugins([
                 ActivitylogPlugin::make()->navigationGroup('Settings')
                     ->resource(ActivityLogResource::class),
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/staff_crew/theme.css');
     }
 }

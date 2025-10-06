@@ -28,7 +28,7 @@ class StaffCrewPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->viteTheme('resources/css/filament/staff_crew/theme.css')
+
             ->id('staff_crew')
             ->path('staff_crew')
             ->login(LoginStaffCrew::class)
@@ -68,7 +68,9 @@ class StaffCrewPanelProvider extends PanelProvider
             ])
             ->plugins([
                 ActivitylogPlugin::make()->navigationGroup('Settings')
-                  ->resource(ActivityLogResource::class),
-            ]);
+                    ->resource(ActivityLogResource::class),
+            ])
+            ->viteTheme('resources/css/filament/staff_crew/theme.css')
+            ;
     }
 }

@@ -29,13 +29,13 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->viteTheme('resources/css/filament/staff_crew/theme.css')
+
             ->default()
             ->id('admin')
             ->path('admin')
             ->login(LoginAdmin::class)
             ->colors([
-              'info' => Color::hex('#3bc4ff'),
+                'info' => Color::hex('#3bc4ff'),
                 'warning' => Color::hex('#EDBC1C'),
                 'success' => Color::hex('#1CED23'),
                 'danger' => Color::hex('#ED1C1C'),
@@ -69,6 +69,7 @@ class AdminPanelProvider extends PanelProvider
             ])->plugins([
                 FilamentSpatieRolesPermissionsPlugin::make(),
                 ActivitylogPlugin::make()->navigationGroup('Settings'),
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/staff_crew/theme.css');
     }
 }
