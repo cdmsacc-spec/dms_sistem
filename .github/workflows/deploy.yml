@@ -133,14 +133,10 @@ jobs:
           ssh -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
           set -e
           ln -sfn '${{ secrets.APP_DIR }}/releases/$RELEASE' '${{ secrets.APP_DIR }}/current'
-          # (opsional) chown symlink — sebenarnya tak wajib; kalau gagal, lanjutkan saja
-          sudo -n chown -h www-data:www-data '${{ secrets.APP_DIR }}/current' || true
-
-          # reload services tanpa prompt password
           sudo -n systemctl reload php8.2-fpm || sudo -n systemctl reload php8.3-fpm || true
           sudo -n systemctl reload nginx || true
           "
-
+          
       - name: Restart queues (if any)
         run: |
           ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
