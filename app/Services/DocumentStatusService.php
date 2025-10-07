@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Filament\StaffDocument\Resources\DocumentResource;
 use App\Filament\StaffDocument\Resources\NotificationResource;
 use App\Models\Document;
+use App\Models\Lookup;
 use App\Models\User;
 use App\Notifications\DocumentStatusChanged;
 use Carbon\Carbon;
@@ -29,6 +30,9 @@ class DocumentStatusService
     {
         $today = Carbon::now(config('app.timezone'));
         $expiration = $document->expirations->first();
+        $dateExpiry = Lookup::where('kategori', 'Document')
+            ->where('code', 'Document Near Expiry')
+            ->value('value');
 
         if (!$expiration || !$expiration->tanggal_expired) {
             return;
@@ -38,6 +42,17 @@ class DocumentStatusService
             ->endOfDay();
 
         $status = 'UpToDate';
+
+        if ($dateExpiry) {  
+            $nearExpiryDate = $expiredDate->copy()->subDays((int) $dateExpiry);      
+            if ($today->greaterThanOrEqualTo($nearExpiryDate) && $today->lessThan($expiredDate)) { 
+                if ($document->status !== 'Near Expiry') {  
+                    $document->status = 'Near Expiry';
+                    $document->save();
+                    $this->sendNotification($document, 'Near Expiry');
+                }
+            }
+        }
 
         foreach ($document->reminders as $reminder) {
             $daysArray = is_array($reminder->reminder_hari)
@@ -56,16 +71,9 @@ class DocumentStatusService
                     $reminderDate->startOfDay();
                 }
 
-
-
-                if (
-                    $today->format('Y-m-d H:i') === $reminderDate->format('Y-m-d H:i') &&
-                    $document->status !== 'Near Expiry'
-                ) {
-                    $status = 'Near Expiry';
-                    $this->sendNotification($document, $status);
-                    $document->status = $status;
-                    $document->save();
+                // Near Expiry
+                if ($today->format('Y-m-d H:i') === $reminderDate->format('Y-m-d H:i')) {
+                    $this->sendNotification($document, null);
                     break 2; // keluar dari semua loop reminders
 
                 }
@@ -85,10 +93,11 @@ class DocumentStatusService
         $recipient = User::whereHas('roles', function ($q) {
             $q->where('name', 'staff_document');
         })->get();
-
+        $title = 'Pembaruan Status Document';
+        $body = $status != null ? "Status document dengan nomor $document->nomor_dokumen telah berubah menjadi $status" : "Status document dengan nomor $document->nomor_dokumen hampir berakhir";
         Notification::make()
-            ->title('Pembaruan Status Document')
-            ->body('Status dari document ' . $document->nomor_dokumen . ' telah berubah menjadi ' . $status)
+            ->title($title)
+            ->body($body)
             ->success()
             ->actions([
                 Action::make('view')

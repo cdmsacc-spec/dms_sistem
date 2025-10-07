@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Filament\StaffCrew\Resources;
+namespace App\Filament\StaffDocument\Resources;
 
-use App\Filament\StaffCrew\Resources\LookupResource\Pages;
-use App\Filament\StaffCrew\Resources\LookupResource\RelationManagers;
+use App\Filament\StaffDocument\Resources\LookupResource\Pages;
 use App\Models\Lookup;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
@@ -34,12 +33,7 @@ class LookupResource extends Resource
                     ->label('Kategori')
                     ->native(false)
                     ->options([
-                        'Interview' => 'Interview',
-                        'Sign Off'  => 'Sign Off',
-                        'Sign On'   => 'Sign On',
-                        'Mutasi Promosi' => 'Mutasi / Promosi',
-                        'Nomor Document' => 'Nomor Document',
-                        'Template Form' => 'Template Form',
+                        'Document' => 'Document',
                     ])
                     ->reactive(), // penting supaya trigger perubahan
 
@@ -49,38 +43,14 @@ class LookupResource extends Resource
                     ->options(function (callable $get) {
                         $kategori = $get('kategori');
                         return match ($kategori) {
-                            'Interview' => [
-                                'Disetujui 1' => 'Disetujui 1',
-                                'Disetujui 2' => 'Disetujui 2',
-                                'Disetujui 3' => 'Disetujui 3',
+                            'Document' => [
+                                'Document Near Expiry' => 'Document Near Expiry',
                             ],
-                            'Sign Off' => [
-                                'Crewing Manager' => 'Crewing Manager',
-                                'Direktur' => 'Direktur',
-                            ],
-                            'Sign On' => [
-                                'Dibuat Oleh' => 'Dibuat Oleh',
-                                'Diperiksa Oleh' => 'Diperiksa Oleh',
-                                'Diketahui Oleh' => 'Diketahui Oleh',
-                                'Disetujui Oleh' => 'Disetujui Oleh',
-                            ],
-                            'Nomor Document' => [
-                                'SignOn' => 'SignOn',
-                            ],
-                            'Template Form' => [
-                                'Template Interview' => 'Template Interview',
-                                'Template Sign On' => 'Template Sign On',
-                                'Template Sign Off' => 'Template Sign Off',
-                                'Template Mutasi Promosi' => 'Template Mutasi Promosi',
-                            ],
-                            'Mutasi Promosi' => [
-                                'Dibuat Oleh' => 'Dibuat Oleh',
-                                'Diketahui Oleh' => 'Diketahui Oleh',
-                                'Disetujui Oleh' => 'Disetujui Oleh'
-                            ],
+
                             default => [],
                         };
                     })
+                    ->unique(ignorable: fn ($record) => $record)
                     ->reactive(),
 
                 TextInput::make('value')
@@ -93,10 +63,10 @@ class LookupResource extends Resource
             ->defaultGroup('kategori')
             ->groupingSettingsHidden()
             ->emptyStateHeading('Tidak Ada Data')
-            ->modifyQueryUsing(fn(Builder $query) => $query->where('kategori', '!=', 'Document')
+            ->emptyStateDescription('belum ada data ditambahkan')
+            ->modifyQueryUsing(fn(Builder $query) => $query->where('kategori', 'Document')
                 ->orderBy('kategori')
                 ->orderBy('code'))
-            ->emptyStateDescription('belum ada data ditambahkan')
             ->columns([
                 TextColumn::make('code')
                     ->badge()

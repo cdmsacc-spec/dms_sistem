@@ -71,7 +71,8 @@ class DocumentResource extends Resource
                                         if ($record && $record->kapal) {
                                             $component->state($record->kapal->perusahaan_id);
                                         }
-                                    }),
+                                    })
+                                    ->required(),
 
                                 // Jenis Kapal
                                 Forms\Components\Select::make('jenis_kapal_id')
@@ -85,7 +86,8 @@ class DocumentResource extends Resource
                                         if ($record && $record->kapal) {
                                             $component->state($record->kapal->jenis_kapal_id);
                                         }
-                                    }),
+                                    })
+                                    ->required(),
 
                                 // Nama Kapal
                                 Forms\Components\Select::make('kapal_id')
@@ -202,7 +204,7 @@ class DocumentResource extends Resource
                                     ->afterStateHydrated(function ($set, $record) {
                                         if ($record) {
                                             $exp = DocumentExpiration::where('document_id', $record->id)
-                                                ->latest('tanggal_expired')
+                                                ->latest()
                                                 ->first();
 
                                             if ($exp) {
@@ -218,7 +220,6 @@ class DocumentResource extends Resource
                             ->disk('public')
                             ->directory('documents')
                             ->dehydrated(false)
-                            ->required(false)
                             ->nullable()
                             ->columnSpanFull()
                             ->getUploadedFileNameForStorageUsing(function ($file, callable $get) {
@@ -301,6 +302,23 @@ class DocumentResource extends Resource
                     ->relationship('kapal.perusahaan', 'nama_perusahaan')
                     ->getOptionLabelFromRecordUsing(fn($record): string =>  $record->nama_perusahaan)
                     ->preload(),
+
+                SelectFilter::make('kapal')
+                    ->searchable()
+                    ->label('Kapal')
+                    ->native(false)
+                    ->relationship('kapal', 'nama_kapal')
+                    ->getOptionLabelFromRecordUsing(fn($record): string =>  $record->nama_kapal)
+                    ->preload(),
+
+                SelectFilter::make('jenis_document')
+                    ->label('Jenis Document')
+                    ->searchable()
+                    ->native(false)
+                    ->relationship('jenisDocument', 'nama_dokumen')
+                    ->getOptionLabelFromRecordUsing(fn($record): string =>  $record->nama_dokumen)
+                    ->preload(),
+
                 SelectFilter::make('status')
                     ->searchable()
                     ->label('Status Document')
@@ -310,13 +328,6 @@ class DocumentResource extends Resource
                         'Near Expiry' => 'Near Expiry',
                         'Expired' => 'Expired'
                     ])
-                    ->preload(),
-                SelectFilter::make('jenis_document')
-                    ->label('Jenis Document')
-                    ->searchable()
-                    ->native(false)
-                    ->relationship('jenisDocument', 'nama_dokumen')
-                    ->getOptionLabelFromRecordUsing(fn($record): string =>  $record->nama_dokumen)
                     ->preload(),
             ])
             ->actions([

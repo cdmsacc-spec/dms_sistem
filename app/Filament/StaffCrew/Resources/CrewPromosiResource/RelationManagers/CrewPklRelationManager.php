@@ -91,7 +91,7 @@ class CrewPklRelationManager extends RelationManager
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('nomor_document')
-                            ->label('Nomor Dokumen Kontrak'),
+                            ->label('Nomor Dokumen Kontrak')->dehydrated(false),
 
                         Forms\Components\TextInput::make('gaji')
                             ->label('Gaji (Rp.)')
