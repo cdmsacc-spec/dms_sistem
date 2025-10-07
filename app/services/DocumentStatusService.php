@@ -58,13 +58,16 @@ class DocumentStatusService
 
 
 
-               if ($today->format('Y-m-d H:i') === $reminderDate->format('Y-m-d H:i') &&
+                if (
+                    $today->format('Y-m-d H:i') === $reminderDate->format('Y-m-d H:i') &&
                     $document->status !== 'Near Expiry'
                 ) {
                     $status = 'Near Expiry';
                     $this->sendNotification($document, $status);
+                    $document->status = $status;
+                    $document->save();
                     break 2; // keluar dari semua loop reminder
-                
+
                 }
             }
         }
@@ -72,9 +75,6 @@ class DocumentStatusService
         if ($today->greaterThanOrEqualTo($expiredDate) && $document->status !== 'Expired') {
             $status = 'Expired';
             $this->sendNotification($document, $status);
-        }
-
-        if ($document->status !== $status) {
             $document->status = $status;
             $document->save();
         }
@@ -93,7 +93,7 @@ class DocumentStatusService
             ->actions([
                 Action::make('view')
                     ->button()
-                    ->url(url("/staff_document/documents/'.$document->id")),
+                    ->url(url("/staff_document/documents/'$document->id")),
             ])
             ->sendToDatabase($recipient);
     }
