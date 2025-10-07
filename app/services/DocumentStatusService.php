@@ -58,19 +58,20 @@ class DocumentStatusService
 
 
 
-                if ($today->greaterThanOrEqualTo($reminderDate) && $today->lessThan($expiredDate)) {
+               if ($today->format('Y-m-d H:i') === $reminderDate->format('Y-m-d H:i') &&
+                    $document->status !== 'Near Expiry'
+                ) {
                     $status = 'Near Expiry';
                     $this->sendNotification($document, $status);
-                    break 2;
+                    break 2; // keluar dari semua loop reminder
+                
                 }
             }
         }
 
-        if ($today->greaterThanOrEqualTo($expiredDate)) {
-            if ($document->status !== 'Expired') {
-                $status = 'Expired';
-                $this->sendNotification($document, $status);
-            }
+        if ($today->greaterThanOrEqualTo($expiredDate) && $document->status !== 'Expired') {
+            $status = 'Expired';
+            $this->sendNotification($document, $status);
         }
 
         if ($document->status !== $status) {
