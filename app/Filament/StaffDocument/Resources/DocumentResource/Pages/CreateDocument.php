@@ -25,7 +25,7 @@ class CreateDocument extends CreateRecord
         $newTanggalTerbit  = $state['tanggal_terbit'] ?? null;
         $newFilePath       = is_array($state['file_path']) ? reset($state['file_path']) : $state['file_path'];
 
-        if (empty($newTanggalTerbit) && empty($newFilePath)) {
+        if (empty($newTanggalTerbit) || empty($newFilePath)) {
             Notification::make()
                 ->title('Validasi Gagal')
                 ->body('File dan Tanggal Terbit wajib diisi!')
