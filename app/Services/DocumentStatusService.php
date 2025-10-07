@@ -93,7 +93,7 @@ class DocumentStatusService
             ->actions([
                 Action::make('view')
                     ->button()
-                    ->url(url("/staff_document/documents/'$document->id")),
+                    ->url(url("/staff_document/documents/$document->id")),
             ])
             ->sendToDatabase($recipient);
     }
