@@ -66,7 +66,7 @@ class DocumentStatusService
                     $this->sendNotification($document, $status);
                     $document->status = $status;
                     $document->save();
-                    break 2; // keluar dari semua loop reminder
+                    break 2; // keluar dari semua loop reminders
 
                 }
             }
