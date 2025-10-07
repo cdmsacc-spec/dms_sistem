@@ -47,6 +47,8 @@ class EditDocument extends EditRecord
 
         if (!empty($newTanggalTerbit) && $isDifferent) {
             if (!empty($newFilePath)) {
+                $this->record->status = 'UpToDate';
+                $this->record->save();
                 DocumentExpiration::create([
                     'document_id'     => $this->record->id,
                     'tanggal_terbit'  => $newTanggalTerbit,
