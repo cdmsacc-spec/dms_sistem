@@ -82,7 +82,7 @@ class CrewPanelProvider extends PanelProvider
                 FilamentEditProfilePlugin::make()
                     ->shouldShowAvatarForm(
                         value: true,
-                        directory: 'public/user/profile',
+                        directory: 'user/profile',
                         rules: 'mimes:jpeg,png'
                     )
                     ->canAccess(fn() => auth()->user()?->can('page_EditProfilePage'))
