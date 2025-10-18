@@ -1,0 +1,257 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\CrewApplicants;
+use App\Models\CrewPkl;
+use App\Models\Jabatan;
+use App\Models\Lookup;
+use App\Models\NamaKapal;
+use App\Models\WilayahOperasional;
+use Illuminate\Http\Request;
+use PhpOffice\PhpWord\TemplateProcessor;
+
+class GenerateFormController extends Controller
+{
+
+    public function generateFormInterview(Request $request)
+    {
+
+        $record = CrewApplicants::findOrFail($request->id);
+        $template = new TemplateProcessor(storage_path('app/public/templates/INTERVIEW FORM.docx'));
+
+        $interview1 = Lookup::where('kategori', 'Interview')
+            ->where('code', 'Disetujui 1')
+            ->value('value');
+
+        $interview2 = Lookup::where('kategori', 'Interview')
+            ->where('code', 'Disetujui 2')
+            ->value('value');
+
+        $interview3 = Lookup::where('kategori', 'Interview')
+            ->where('code', 'Disetujui 3')
+            ->value('value');
+
+        $template->setValue('interview1', $interview1 ?? '');
+        $template->setValue('interview2', $interview2 ?? '');
+        $template->setValue('interview3', $interview3 ?? '');
+
+        $template->setValue('nama', $record->nama_crew);
+        $template->setValue('ttl', $record->tempat_lahir . ' ' . \Carbon\Carbon::parse($record->tanggal_lahir)->format('d M Y'));
+        $template->setValue('posisi', $record->posisi_dilamar);
+        $template->setValue('kapal', $request->nama_kapal ?? '');
+
+        $date = now()->format('d-m-Y');
+        $fileName = 'Interview_Form_' . $record->nama_crew . ' ' . $date . '.docx';
+        $tempFile = tempnam(sys_get_temp_dir(), 'word');
+        $template->saveAs($tempFile);
+
+        return response()->download($tempFile, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ])->deleteFileAfterSend(true);
+    }
+
+    public function generateFormSignon(Request $request)
+    {
+        //$request->id adalah id pkl
+        $pkl = CrewPkl::with(['wilayah:id,nama_wilayah', 'jabatan:id,nama_jabatan', 'crew:id,nama_crew', 'kapal:id,nama_kapal', 'perusahaan:id,nama_perusahaan,kode_perusahaan,alamat,telepon'])->findOrFail($request->id);
+        $template = new TemplateProcessor(storage_path('app/public/templates/MUTASI SIGN ON.docx'));
+
+        //=>header section
+        $bulanAngka = (int) $pkl->created_at->format('m');
+
+        // Mapping bulan ke romawi
+        $bulanRomawi = [
+            1 => 'I',
+            2 => 'II',
+            3 => 'III',
+            4 => 'IV',
+            5 => 'V',
+            6 => 'VI',
+            7 => 'VII',
+            8 => 'VIII',
+            9 => 'IX',
+            10 => 'X',
+            11 => 'XI',
+            12 => 'XII',
+        ][$bulanAngka];
+
+        $no_document =  $pkl->nomor_document;
+        $perusahaan = $pkl->perusahaan->nama_perusahaan;
+        $code_perusahaan = $pkl->perusahaan->kode_perusahaan;
+        $alamat_perusahaan = $pkl->perusahaan->alamat;
+        $tlp_perusahaan = $pkl->perusahaan->telepon;
+        $bulan = $bulanRomawi;
+        $tahun = $pkl->created_at->format('Y');
+
+        $template->setValue('no_document', $no_document);
+        $template->setValue('perusahaan', $perusahaan);
+        $template->setValue('code_perusahaan', $code_perusahaan);
+        $template->setValue('bulan', $bulan);
+        $template->setValue('tahun', $tahun);
+        $template->setValue('alamat_perusahaan', $alamat_perusahaan);
+        $template->setValue('tlp_perusahaan', $tlp_perusahaan);
+        //==>end section
+
+        //=>body section
+        $crew      = $pkl->crew->nama_crew;
+        $jabatan    = $pkl->jabatan->nama_jabatan;
+        $gaji = $pkl->gaji;
+        $status = 'Sign On / PKL';
+        $berangkat_dari = $pkl->berangkat_dari;
+        $wilayah   = $pkl->wilayah->nama_wilayah;
+        $kapal      = $pkl->kapal->nama_kapal;
+        $start_date = \Carbon\Carbon::parse($pkl->start_date)->format('d M Y');
+
+
+        $template->setValue('nama', $crew);
+        $template->setValue('jabatan', $jabatan);
+        $template->setValue('gaji', $gaji);
+        $template->setValue('status', $status);
+        $template->setValue('berangkat_dari', $berangkat_dari);
+        $template->setValue('wilayah', $wilayah);
+        $template->setValue('kapal', $kapal);
+        $template->setValue('start_date', $start_date);
+        //==>end section
+
+        //=>FOOTER section
+        $dibuat = Lookup::where('kategori', 'Sign On')
+            ->where('code', 'Dibuat Oleh')
+            ->value('value');
+        $diperiksa = Lookup::where('kategori', 'Sign On')
+            ->where('code', 'Diperiksa Oleh')
+            ->value('value');
+        $diketahui1 = Lookup::where('kategori', 'Sign On')
+            ->where('code', 'Diketahui Oleh')
+            ->orderBy('id', 'asc')
+            ->skip(0)
+            ->value('value');
+        $diketahui2 = Lookup::where('kategori', 'Sign On')
+            ->where('code', 'Diketahui Oleh')
+            ->orderBy('id', 'asc')
+            ->skip(1)
+            ->value('value');
+        $disetujui1 = Lookup::where('kategori', 'Sign On')
+            ->where('code', 'Disetujui Oleh')
+            ->orderBy('id', 'asc')
+            ->skip(0)
+            ->value('value');
+        $disetujui2 = Lookup::where('kategori', 'Sign On')
+            ->where('code', 'Disetujui Oleh')
+            ->orderBy('id', 'asc')
+            ->skip(1)
+            ->value('value');
+
+        $template->setValue('dibuat', $dibuat);
+        $template->setValue('diperiksa', $diperiksa);
+        $template->setValue('diketahui1', $diketahui1);
+        $template->setValue('diketahui2', $diketahui2);
+        $template->setValue('disetujui1', $disetujui1);
+        $template->setValue('disetujui2', $disetujui2);
+        //==>end section
+
+
+
+        $date = now()->format('d-m-Y');
+        $fileName = 'Sign_On_Form_' . $crew . ' ' . $date . '.docx';
+        $tempFile = tempnam(sys_get_temp_dir(), 'word');
+        $template->saveAs($tempFile);
+
+        return response()->download($tempFile, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ])->deleteFileAfterSend(true);
+    }
+
+    public function generateFormSignoff(Request $request)
+    {
+        try {
+
+            $pkl = CrewPkl::with(['wilayah:id,nama_wilayah', 'jabatan:id,nama_jabatan,devisi,golongan', 'crew:id,nama_crew', 'kapal:id,nama_kapal', 'perusahaan:id,nama_perusahaan,kode_perusahaan,alamat,telepon'])->where('crew_id', $request->id);
+            $firstPkl = (clone $pkl)->orderBy('start_date', 'asc')->first();   // ambil paling awal
+            $lastPkl  = (clone $pkl)->orderBy('start_date', 'desc')->first();  // ambil paling akhir
+            $template = new TemplateProcessor(storage_path('app/public/templates/MUTASI SIGN OFF.docx'));
+
+            $bulanAngka = (int) now()->format('m');
+
+            // Mapping bulan ke romawi
+            $bulanRomawi = [
+                1 => 'I',
+                2 => 'II',
+                3 => 'III',
+                4 => 'IV',
+                5 => 'V',
+                6 => 'VI',
+                7 => 'VII',
+                8 => 'VIII',
+                9 => 'IX',
+                10 => 'X',
+                11 => 'XI',
+                12 => 'XII',
+            ][$bulanAngka];
+
+            $no_document =  $lastPkl->nomor_document;
+            $perusahaan = $lastPkl->perusahaan->nama_perusahaan;
+            $code_perusahaan = $lastPkl->perusahaan->kode_perusahaan;
+            $alamat_perusahaan = $lastPkl->perusahaan->alamat;
+            $tlp_perusahaan = $lastPkl->perusahaan->telepon;
+            $bulan = $bulanRomawi;
+            $tahun = now()->format('Y');
+
+            $template->setValue('nomor_document', $no_document); //
+            $template->setValue('perusahaan', $perusahaan); //
+            $template->setValue('kode_perusahaan', $code_perusahaan);
+            $template->setValue('bulan', $bulan); //
+            $template->setValue('tahun', $tahun); //
+            $template->setValue('alamat_perusahaan', $alamat_perusahaan); //
+            $template->setValue('telepon_perusahaan', $tlp_perusahaan); //
+            //==>end section
+
+            //=>body section
+            $crew      = $lastPkl->crew->nama_crew;
+            $jabatan    = $lastPkl->jabatan->devisi . ' / ' . $lastPkl->jabatan->nama_jabatan;
+            $status = 'Sign Off';
+            $wilayah   = $lastPkl->wilayah->nama_wilayah;
+            $kapal      = $lastPkl->kapal->nama_kapal;
+            $start_date = \Carbon\Carbon::parse($lastPkl->start_date)->format('d M Y');
+            $end_date   = \Carbon\Carbon::parse($lastPkl->end_date)->format('d M Y');
+            $tanggal = now()->format('d M Y');
+            $alasan_berhenti = $request->alasan_berhenti;
+            $manager =  Lookup::where('kategori', 'Sign Off')
+                ->where('code', 'Crewing Manager')
+                ->value('value');
+            $direktur =  Lookup::where('kategori', 'Sign Off')
+                ->where('code', 'Direktur')
+                ->value('value');
+            $jabatan_awal = $firstPkl->jabatan->nama_jabatan;
+            $jabatan_akhir = $lastPkl->jabatan->nama_jabatan;
+
+            $template->setValue('nama', $crew); //
+            $template->setValue('jabatan', $jabatan); //
+            $template->setValue('status', $status); //
+            $template->setValue('wilayah_operasional', $wilayah); //
+            $template->setValue('kapal', $kapal); //
+            $template->setValue('start_date', $start_date); //
+            $template->setValue('end_date', $end_date); //
+            $template->setValue('tanggal', $tanggal); //
+            $template->setValue('alasan_berhenti', $alasan_berhenti); //
+            $template->setValue('jabatan_awal', $jabatan_awal); //
+            $template->setValue('jabatan_akhir', $jabatan_akhir); //
+            $template->setValue('manager', $manager); //
+            $template->setValue('direktur', $direktur); //
+
+
+            //==>end section
+
+            $date = now()->format('d-m-Y');
+            $fileName = 'Sign_Off_Form_' . $crew . ' ' . $date . '.docx';
+            $tempFile = tempnam(sys_get_temp_dir(), 'word');
+            $template->saveAs($tempFile);
+
+            return response()->download($tempFile, $fileName, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ])->deleteFileAfterSend(true);
+        } catch (\Throwable $th) {
+            dd($th->getMessage());
+        }
+    }
+}
