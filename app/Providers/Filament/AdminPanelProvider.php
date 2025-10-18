@@ -120,7 +120,7 @@ class AdminPanelProvider extends PanelProvider
                     )
                     ->canAccess(fn() => auth()->user()?->can('page_EditProfilePage'))
                     ->shouldShowDeleteAccountForm(false)
-                    ->shouldShowSanctumTokens()
+                    //->shouldShowSanctumTokens()
                     ->shouldShowBrowserSessionsForm(false)
                     ->shouldRegisterNavigation(false),
             ])
