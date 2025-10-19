@@ -121,6 +121,7 @@ class DocumentResource extends Resource
 
                                 // Jenis Dokumen
                                 Forms\Components\Select::make('jenis_dokumen_id')
+                                    ->searchable()
                                     ->relationship('jenisDocument', 'nama_dokumen')
                                     ->native(false)
                                     ->required(),

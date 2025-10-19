@@ -21,7 +21,7 @@ class InterviewResource extends Resource
     protected static ?string $model = CrewApplicants::class;
     protected static ?string $slug = 'crew-interview';
     protected static ?string $navigationLabel = 'Interview';
-    protected static ?string $pluralModelLabel = 'Inrerviews';
+    protected static ?string $pluralModelLabel = 'Interviews';
     protected static ?string $navigationGroup = 'Crew Management';
     protected static ?int $navigationSort = 4;
 

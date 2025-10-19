@@ -41,6 +41,10 @@ class CrewCertificatesReminderService
     {
         try {
             if (!$doc->tanggal_expired) {
+                if ($doc->status !== StatusDocumentFile::UpToDate->value) {
+                    $doc->update(['status' => StatusDocumentFile::UpToDate->value]);
+                    $this->sendNotification($doc,  StatusDocumentFile::UpToDate->value);
+                }
                 return;
             }
 

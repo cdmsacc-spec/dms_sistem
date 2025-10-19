@@ -87,7 +87,7 @@ class CrewPanelProvider extends PanelProvider
                     )
                     ->canAccess(fn() => auth()->user()?->can('page_EditProfilePage'))
                     ->shouldShowDeleteAccountForm(false)
-                    ->shouldShowSanctumTokens()
+                    ->shouldShowSanctumTokens(false)
                     ->shouldShowBrowserSessionsForm(false)
                     ->shouldRegisterNavigation(false),
             ])

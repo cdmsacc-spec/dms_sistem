@@ -34,6 +34,10 @@ class CrewDocumentReminderService
     public function updateStatus(CrewDocuments $doc, Carbon $today): void
     {
         if (!$doc->tanggal_expired) {
+            if ($doc->status !== StatusDocumentFile::UpToDate->value) {
+                $doc->update(['status' => StatusDocumentFile::UpToDate->value]);
+                $this->sendNotification($doc,  StatusDocumentFile::UpToDate->value);
+            }
             return;
         }
 

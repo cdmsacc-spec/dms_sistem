@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\StatusDocumentFile;
 use App\Filament\StaffDocument\Resources\DocumentResource;
 use App\Filament\StaffDocument\Resources\NotificationResource;
 use App\Models\Document;
@@ -35,6 +36,11 @@ class DocumentStatusService
             ->value('value');
 
         if (!$expiration || !$expiration->tanggal_expired) {
+            if ($document->status !== StatusDocumentFile::UpToDate->value) {
+                $document->status =  StatusDocumentFile::UpToDate->value;
+                $document->save();
+                $this->sendNotification($document,  StatusDocumentFile::UpToDate->value);
+            }
             return;
         }
 

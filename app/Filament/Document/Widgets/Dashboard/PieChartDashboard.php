@@ -16,6 +16,10 @@ class PieChartDashboard extends ChartWidget
     protected static ?string $heading = 'Status All Documment';
     protected static ?int $sort = 2;
     protected int | string | array $columnSpan = 2;
+    public  function getMaxHeight(): ?string
+    {
+        return '38vh';
+    }
 
 
     protected function getData(): array
