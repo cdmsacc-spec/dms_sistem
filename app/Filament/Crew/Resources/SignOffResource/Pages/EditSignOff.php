@@ -104,6 +104,7 @@ class EditSignOff extends EditRecord
                 ->body('The crew Sign Off results have been successfully saved')
                 ->success()
                 ->send();
+            redirect($this->getResource()::getUrl('index'));
         } catch (\Throwable $th) {
             Notification::make()
                 ->title('Failed')
