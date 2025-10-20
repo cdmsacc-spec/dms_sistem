@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Filament\Crew\Resources;
-
+use Filament\Forms\Components\DatePicker;
 use App\Enums\StatusCrew;
 use App\Filament\Crew\Resources\InterviewResource\Pages;
 use App\Filament\Crew\Resources\InterviewResource\RelationManagers\CrewInterviewRelationManager;
@@ -36,6 +36,11 @@ class InterviewResource extends Resource
                     ->columns(3)
                     ->schema([
                         // Grid hasil interview
+                        DatePicker::make('tanggal')
+                            ->label('Tanggal Interview')
+                            ->prefixIcon('heroicon-m-calendar')
+                            ->native(false)
+                            ->required(),
                         Grid::make(2)->schema([
                             Forms\Components\TextInput::make('hasil_interviewe1')
                                 ->label('Hasil Interviewer 1')
