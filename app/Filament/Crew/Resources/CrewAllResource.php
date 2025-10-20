@@ -212,7 +212,7 @@ class CrewAllResource extends Resource
                     ->nextAction(fn(Action $action) => $action->label('Next step'))
                     ->columnSpanFull(),
 
-              
+
             ]);
     }
 
@@ -268,9 +268,10 @@ class CrewAllResource extends Resource
                         if (empty($data['value'])) return;
 
                         $query->whereHas('crewPkl', function ($q) use ($data) {
-                            $q->whereHas('jabatan', function ($q2) use ($data) {
-                                $q2->where('golongan', $data['value']);
-                            });
+                            $q->where('status_kontrak', 'Active')
+                                ->whereHas('jabatan', function ($q2) use ($data) {
+                                    $q2->where('golongan', $data['value']);
+                                });
                         });
                     }),
                 \Filament\Tables\Filters\SelectFilter::make('perusahaaan')
@@ -283,9 +284,10 @@ class CrewAllResource extends Resource
                         if (empty($data['value'])) return;
 
                         $query->whereHas('crewPkl', function ($q) use ($data) {
-                            $q->whereHas('perusahaan', function ($q2) use ($data) {
-                                $q2->where('nama_perusahaan', $data['value']);
-                            });
+                            $q->where('status_kontrak', 'Active')
+                                ->whereHas('perusahaan', function ($q2) use ($data) {
+                                    $q2->where('nama_perusahaan', $data['value']);
+                                });
                         });
                     }),
 
