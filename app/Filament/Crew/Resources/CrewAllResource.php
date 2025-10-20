@@ -264,6 +264,7 @@ class CrewAllResource extends Resource
                     ->options(function () {
                         return Jabatan::get()->pluck('golongan', 'golongan')->toArray();
                     })
+                    
                     ->query(function ($query, $data) {
                         if (empty($data['value'])) return;
 

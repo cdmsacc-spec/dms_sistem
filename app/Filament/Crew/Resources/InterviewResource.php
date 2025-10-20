@@ -7,6 +7,7 @@ use App\Filament\Crew\Resources\InterviewResource\Pages;
 use App\Filament\Crew\Resources\InterviewResource\RelationManagers\CrewInterviewRelationManager;
 use App\Models\CrewApplicants;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
@@ -35,7 +36,12 @@ class InterviewResource extends Resource
                 Section::make('')
                     ->columns(3)
                     ->schema([
-                        // Grid hasil interview
+                        // Grid hasil interview\
+                        DatePicker::make('tanggal')
+                            ->label('Tanggal Interview')
+                            ->prefixIcon('heroicon-m-calendar')
+                            ->native(false)
+                            ->required(),
                         Grid::make(2)->schema([
                             Forms\Components\TextInput::make('hasil_interviewe1')
                                 ->label('Hasil Interviewer 1')
