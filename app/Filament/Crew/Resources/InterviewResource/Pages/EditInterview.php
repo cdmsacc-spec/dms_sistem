@@ -18,7 +18,6 @@ class EditInterview extends EditRecord
     protected static string $resource = InterviewResource::class;
 
     protected bool $isApproved = false;
-    public ?string $tanggalInterview = null;
 
     protected function getFormActions(): array
     {
@@ -53,11 +52,6 @@ class EditInterview extends EditRecord
                 ->modalIcon('heroicon-o-printer')
                 ->modalDescription('Pilih kapal untuk generate form interview')
                 ->form([
-                    DatePicker::make('tanggal')
-                        ->label('Tanggal Interview')
-                        ->prefixIcon('heroicon-m-calendar')
-                        ->native(false)
-                        ->required(),
                     Select::make('nama_kapal')
                         ->label('Pilih Kapal')
                         ->options(NamaKapal::pluck('nama_kapal', 'id'))
@@ -72,11 +66,9 @@ class EditInterview extends EditRecord
                 ->action(function (array $data, StaticAction  $action) {
                     $kapal = NamaKapal::find($data['nama_kapal']);
                     $namaKapal = $kapal?->nama_kapal;
-                    $this->tanggalInterview = $data['tanggal'];
                     redirect()->route('generate.interview', [
                         'id' => $this->record->id,
                         'nama_kapal' => $namaKapal,
-                        'tanggal_interview' => $this->tanggalInterview
                     ]);
                 })
         ];
@@ -85,7 +77,7 @@ class EditInterview extends EditRecord
     {
         $item = $this->form->getRawState();
         if (
-            !empty($this->tanggalInterview) &&
+            !empty($item['tanggal']) &&
             !empty($item['file_path']) &&
             !empty($item['sumary']) &&
             !empty($item['hasil_interviewe1']) &&
@@ -98,7 +90,7 @@ class EditInterview extends EditRecord
                 'hasil_interviewe2' => $item['hasil_interviewe2'] ?? null,
                 'hasil_interviewe3' => $item['hasil_interviewe3'] ?? null,
                 'sumary' => $item['sumary'] ?? null,
-                'tanggal'    => \Carbon\Carbon::parse($this->tanggalInterview)->format('Y-m-d')  ?? null,
+                'tanggal'    => \Carbon\Carbon::parse($item['tanggal'])->format('Y-m-d')  ?? null,
                 'keterangan' => $item['keterangan'] ?? null,
                 'file_path'  => $file
             ]);
