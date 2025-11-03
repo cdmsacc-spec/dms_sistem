@@ -33,7 +33,7 @@ class AppraisalResource extends Resource
                     ->description('Detail informasi crew')
                     ->icon('heroicon-m-user')
                     ->headerActions([
-                        Forms\Components\Actions\Action::make('Selengkapnya')
+                        Forms\Components\Actions\Action::make('Selengkapnya.')
                             ->url(fn($record) => CrewAllResource::getUrl('view', ['record' => $record->crew->id]))
                             ->openUrlInNewTab(false)
                     ])
