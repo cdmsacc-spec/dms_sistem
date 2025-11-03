@@ -7,6 +7,7 @@ use App\Models\DocumentExpiration;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
+use Filament\Support\Exceptions\Halt;
 
 class EditDocument extends EditRecord
 {
@@ -26,37 +27,39 @@ class EditDocument extends EditRecord
         $this->isRenew = request()->boolean('renew');
     }
 
-    protected function afterSave(): void
+    protected function beforeSave(): void
     {
-        try {
-            $state = $this->form->getRawState();
-            $newFilePath = is_array($state['file_path']) ? reset($state['file_path']) : $state['file_path'];
 
-            if (!empty($newFilePath)) {
-                // Jika ada file baru → buat record baru
+        $state = $this->form->getRawState();
+        $newFilePath = is_array($state['file_path']) ? reset($state['file_path']) : $state['file_path'];
+
+        if (!empty($newFilePath)) {
+            // Jika ada file baru → buat record baru
+            if (!empty($state['nomor_dokumen'])) {
                 DocumentExpiration::create([
                     'document_id'     => $this->record->id,
+                    'nomor_dokumen'  => $state['nomor_dokumen'],
                     'tanggal_terbit'  => $state['tanggal_terbit'],
                     'tanggal_expired' => $state['tanggal_expired'],
                     'file_path'       => $newFilePath,
                 ]);
             } else {
-                // Jika tidak ada file baru → update data yang sudah ada
-                if (!empty($state['tanggal_terbit']) || !empty($state['tanggal_expired'])) {
-                    $this->record->latestExpiration->update([
-                        'tanggal_terbit'  => $state['tanggal_terbit'],
-                        'tanggal_expired' => $state['tanggal_expired'],
-                    ]);
-                }
+                Notification::make()
+                    ->title('Field Requeired')
+                    ->body('Saat memperbarui file dokumen, nomor dokumen tidak boleh kosong')
+                    ->danger()
+                    ->send();
+                throw new Halt();
             }
-        } catch (\Throwable $th) {
-            Notification::make()
-                ->title('Error')
-                ->body('Terjadi kesalahan saat menyimpan data: ' . $th->getMessage())
-                ->danger()
-                ->send();
-
-            throw $th;
+        } else {
+            // Jika tidak ada file baru → update data yang sudah ada
+            if (!empty($state['tanggal_terbit']) || !empty($state['tanggal_expired']) || !empty($state['nomor_dokumen'])) {
+                $this->record->latestExpiration->update([
+                    'nomor_dokumen'  => $state['nomor_dokumen'] ?? $this->record->latestExpiration->nomor_dokumen,
+                    'tanggal_terbit'  => $state['tanggal_terbit'] ?? $this->record->latestExpiration->tanggal_terbit,
+                    'tanggal_expired' => $state['tanggal_expired'],
+                ]);
+            }
         }
     }
 

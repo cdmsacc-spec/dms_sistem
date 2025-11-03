@@ -17,7 +17,7 @@ class WilayahOperasionalResource extends Resource
 {
     protected static ?string $model = WilayahOperasional::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
     protected static ?string $navigationLabel = 'Wilayah Operasional';
     protected static ?string $navigationGroup = 'Master Data';
      protected static ?int $navigationSort = 11;

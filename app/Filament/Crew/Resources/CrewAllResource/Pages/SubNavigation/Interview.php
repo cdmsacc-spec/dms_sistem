@@ -9,8 +9,10 @@ use Filament\Forms\Form;
 use Filament\Resources\Pages\ManageRelatedRecords;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Hugomyb\FilamentMediaAction\Tables\Actions\MediaAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
 
 class Interview extends ManageRelatedRecords
 {
@@ -43,12 +45,6 @@ class Interview extends ManageRelatedRecords
                     ->label('Interview 3'),
                 Tables\Columns\TextColumn::make('sumary')
                     ->label('Summary'),
-                Tables\Columns\TextColumn::make('file_path')
-                    ->label('File')
-                    ->badge()
-                    ->color('info')
-                    ->formatStateUsing(fn($state) => $state != null ? 'Download' : '')
-                    ->url(fn($record) => $record->file_path ? asset('storage/' . $record->file_path) : null, shouldOpenInNewTab: true)
 
             ])
             ->filters([
@@ -56,6 +52,34 @@ class Interview extends ManageRelatedRecords
             ])
             ->headerActions([])
             ->actions([
+                Tables\Actions\Action::make('download')
+                    ->size('sm')
+                    ->color('success')
+                    ->button()
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->url(fn($record) => asset('storage/' . $record->file_path), shouldOpenInNewTab: true)
+                    ->visible(function ($record) {
+                        $path = $record->file_path ?? null;
+                        if (! $path) return false;
+                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                        return $extension != 'pdf';
+                    }),
+
+                MediaAction::make('priview')
+                    ->label('Priview')
+                    ->size('sm')
+                    ->color('success')
+                    ->button()
+                    ->icon('heroicon-o-eye')
+                    ->modalHeading(fn($record) => 'Interview ' . $record->tanggal)
+                    ->media(fn($record) => str_replace(' ', '%20', Storage::url($record->file_path)))
+                    ->visible(function ($record) {
+                        $path = $record->file_path ?? null;
+                        if (! $path) return false;
+                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                        return $extension === 'pdf';
+                    }),
+                Tables\Actions\EditAction::make()->button(),
                 Tables\Actions\DeleteAction::make()->button(),
             ])
             ->bulkActions([

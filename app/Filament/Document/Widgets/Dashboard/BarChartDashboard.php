@@ -111,6 +111,11 @@ class BarChartDashboard extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'responsive' => true,
+            'animation' => [
+                'duration' => 1000, // durasi animasi (ms)
+                'easing' => 'easeOutQuart', // gaya animasi
+            ],
             'scales' => [
                 'x' => [
                     'stacked' => true,

@@ -8,13 +8,14 @@ use App\Models\PklReminder;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Alignment;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class PklReminderResource extends Resource
 {
     protected static ?string $model = PklReminder::class;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clock';
     protected static ?string $navigationLabel = 'Reminder';
     protected static ?string $navigationGroup = 'Settings';
     public static function form(Form $form): Form
@@ -31,6 +32,8 @@ class PklReminderResource extends Resource
                     ->seconds(false)
                     ->time()
                     ->placeholder('Pilih jam'),
+
+                    
             ]);
     }
 

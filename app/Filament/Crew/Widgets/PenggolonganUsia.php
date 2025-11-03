@@ -62,6 +62,11 @@ class PenggolonganUsia extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'responsive' => true,
+            'animation' => [
+                'duration' => 1000, // durasi animasi (ms)
+                'easing' => 'easeOutQuart', // gaya animasi
+            ],
             'scales' => [
                 'y' => [
                     'ticks' => [

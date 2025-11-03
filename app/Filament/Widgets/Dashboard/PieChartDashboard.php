@@ -78,6 +78,16 @@ class PieChartDashboard extends ChartWidget
             'labels' => ['Expired', 'NearExpiry', 'UpToDate'],
         ];
     }
+    protected function getOptions(): array
+    {
+        return [
+            'responsive' => true,
+            'animation' => [
+                'duration' => 1000, // durasi animasi (ms)
+                'easing' => 'easeOutQuart', // gaya animasi
+            ],
+        ];
+    }
 
     protected function getType(): string
     {

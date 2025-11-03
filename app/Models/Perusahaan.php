@@ -8,7 +8,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Perusahaan extends Model
 {
-     use LogsActivity;
+    use LogsActivity;
     protected $fillable = [
         'nama_perusahaan',
         'kode_perusahaan',
@@ -16,9 +16,11 @@ class Perusahaan extends Model
         'email',
         'telepon',
         'npwp',
+        'file_path',
+        'keterangan',
     ];
 
-     public function getActivitylogOptions(): LogOptions
+    public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logAll()

@@ -14,10 +14,10 @@ class DocumentReminder extends Model
     ];
     protected static function booted()
     {
- static::creating(function ($reminder) {
-        \Log::info('Creating Reminder:', $reminder->toArray());
-    });
-    
+        static::creating(function ($reminder) {
+            \Log::info('Creating Reminder:', $reminder->toArray());
+        });
+
         static::saved(function ($reminder) {
             $document = $reminder->document;
             Log::info($document);
@@ -29,7 +29,7 @@ class DocumentReminder extends Model
                     ->withProperties([
                         'attributes' => $reminder->getAttributes(),
                     ])
-                    ->log("Reminder ID {$reminder->id} for Document '{$document->title}' has been created");
+                    ->log("Reminder ID {$reminder->id} for Document '{$document->kapal->nama_kapal}' has been created");
             }
         });
 
@@ -43,7 +43,7 @@ class DocumentReminder extends Model
                     ->withProperties([
                         'attributes' => $reminder->getAttributes(),
                     ])
-                    ->log("Reminder ID {$reminder->id} for Document '{$document->title}' has been deleted");
+                    ->log("Reminder ID {$reminder->id} for Document '{$document->kapal->nama_kapal}' has been deleted");
             }
         });
     }

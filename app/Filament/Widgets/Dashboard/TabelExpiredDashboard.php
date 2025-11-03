@@ -40,7 +40,7 @@ class TabelExpiredDashboard extends BaseWidget
             ])
             ->groupingSettingsHidden()
             ->actions([
-                 Action::make('view')
+                Action::make('view')
                     ->color('success')
                     ->visible(auth()->user()?->can('view_any_document'))
                     ->button()
@@ -61,7 +61,7 @@ class TabelExpiredDashboard extends BaseWidget
                     ->searchable(),
                 Tables\Columns\TextColumn::make('jenisDocument.nama_dokumen')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('nomor_dokumen')
+                Tables\Columns\TextColumn::make('latestExpiration.nomor_dokumen')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('latestExpiration.tanggal_expired')
                     ->label('Expired')

@@ -31,8 +31,8 @@ class LoginStaffDocument extends Login
             ])
             ->event('login')
             ->log('User logged in');
-
-        return $response; 
+        session(['show_expired_modal' => true]);
+        return $response;
     }
 
 

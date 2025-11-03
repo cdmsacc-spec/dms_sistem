@@ -3,20 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Kirschbaum\Commentions\Comment;
+use Kirschbaum\Commentions\Contracts\Commentable;
+use Kirschbaum\Commentions\HasComments;
 use Parallax\FilamentComments\Models\FilamentComment;
 use Parallax\FilamentComments\Models\Traits\HasFilamentComments;
 use Spatie\Activitylog\Contracts\Activity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Document extends Model
+class Document extends Model implements Commentable
 {
-    use HasFilamentComments, LogsActivity;
+    use HasFilamentComments, LogsActivity, HasComments;
     protected $fillable = [
         'kapal_id',
         'jenis_dokumen_id',
         'created_by',
-        'nomor_dokumen',
         'keterangan',
         'penerbit',
         'tempat_penerbitan',
@@ -24,13 +26,13 @@ class Document extends Model
         'status',
     ];
 
-    public function comments()
+    public function comment()
     {
-        return $this->morphMany(FilamentComment::class, 'subject');
+        return $this->morphMany(Comment::class, 'commentable');
     }
     public function getLastCommentAttribute()
     {
-        return $this->comments()->latest('created_at')->first()?->comment ?? '-';
+        return $this->comment()->latest('created_at')->first()?->body ?? '-';
     }
     public function getActivitylogOptions(): LogOptions
     {
@@ -76,11 +78,19 @@ class Document extends Model
         return $this->hasOne(DocumentExpiration::class)->latestOfMany();
     }
 
+    public function reminderemail()
+    {
+        return $this->hasMany(EmailReminder::class, 'document_id');
+    }
+
     protected static function booted()
     {
         static::deleting(function ($document) {
             foreach ($document->expirations as $expiration) {
                 $expiration->delete(); // ini akan memicu event deleted di DocumentExpiration
+            }
+            foreach ($document->reminderemail as $reminderemails) {
+                $reminderemails->delete(); // ini akan memicu event deleted di DocumentExpiration
             }
         });
     }

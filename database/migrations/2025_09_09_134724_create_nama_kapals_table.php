@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('jenis_kapal_id')->constrained('jenis_kapals')->noActionOnDelete();
             $table->string('nama_kapal');
             $table->string('status_certified');
+            $table->string('file_path')->nullable();
+            $table->text('keterangan')->nullable();
             $table->string('tahun_kapal')->nullable()->default(null);
             $table->timestamps();
         });

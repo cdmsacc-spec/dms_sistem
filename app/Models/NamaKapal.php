@@ -16,6 +16,8 @@ class NamaKapal extends Model
         'nama_kapal',
         'status_certified',
         'tahun_kapal',
+        'file_path',
+        'keterangan',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -44,5 +46,26 @@ class NamaKapal extends Model
     public function document()
     {
         return $this->hasMany(Document::class, 'kapal_id');
+    }
+
+    protected static function booted()
+    {
+
+
+        static::updating(function ($model) {
+            if ($model->isDirty('file_path')) {
+                $oldFile = $model->getOriginal('file_path');
+
+                if ($oldFile && \Storage::disk('public')->exists($oldFile)) {
+                    \Storage::disk('public')->delete($oldFile);
+                }
+            }
+        });
+
+        static::deleted(function ($model) {
+            if ($model->file_path && \Storage::disk('public')->exists($model->file_path)) {
+                \Storage::disk('public')->delete($model->file_path);
+            }
+        });
     }
 }

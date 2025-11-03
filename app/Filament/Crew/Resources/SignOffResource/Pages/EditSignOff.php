@@ -18,9 +18,9 @@ class EditSignOff extends EditRecord
     public ?string $tanggalSignOff = null;
 
     protected function getRedirectUrl(): string
-{
-    return $this->getResource()::getUrl('index');
-}
+    {
+        return $this->getResource()::getUrl('index');
+    }
 
     public function getTitle(): string
     {
@@ -104,6 +104,7 @@ class EditSignOff extends EditRecord
                 ->body('The crew Sign Off results have been successfully saved')
                 ->success()
                 ->send();
+          redirect($this->getResource()::getUrl('index'));
         } catch (\Throwable $th) {
             Notification::make()
                 ->title('Failed')

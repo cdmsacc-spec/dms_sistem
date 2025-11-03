@@ -21,6 +21,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Support\Enums\ActionSize;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 
 class Dashboard extends \Filament\Pages\Dashboard
@@ -30,6 +33,7 @@ class Dashboard extends \Filament\Pages\Dashboard
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
     protected static ?string $navigationLabel = 'Dashboard';
     protected static ?string $title = 'Dashboard';
+
     public function persistsFiltersInSession(): bool
     {
         return false;
@@ -40,7 +44,6 @@ class Dashboard extends \Filament\Pages\Dashboard
         return 4;
     }
 
-
     public function getHeaderWidgets(): array
     {
         return [
@@ -49,6 +52,7 @@ class Dashboard extends \Filament\Pages\Dashboard
 
         ];
     }
+
     public function getWidgets(): array
     {
         return [
@@ -58,8 +62,6 @@ class Dashboard extends \Filament\Pages\Dashboard
             TabelExpiredDashboard::class
         ];
     }
-
-
 
     public function filtersForm(Form $form)
     {
@@ -74,12 +76,27 @@ class Dashboard extends \Filament\Pages\Dashboard
                             ->native(false)
                             ->options(fn() => Perusahaan::pluck('nama_perusahaan', 'id'))
                             ->searchable()
-                            ->columnSpan(2),
+                            ->reactive()
+                            ->preload()
+                            ->columnSpan(2)
+                            ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, $state) {
+                                if (empty($state)) {
+                                    $set('kapal', null);
+                                }
+                            }),
                         Select::make('kapal')
                             ->label('')
                             ->placeholder('kapal')
                             ->native(false)
-                            ->options(fn() => NamaKapal::pluck('nama_kapal', 'id'))
+                            ->options(function (callable $get) {
+                                $perusahaanId = $get('perusahaan');
+                                if ($perusahaanId) {
+                                    return Namakapal::where('perusahaan_id', $perusahaanId)
+                                        ->pluck('nama_kapal', 'id')
+                                        ->toArray();
+                                }
+                                return [];
+                            })
                             ->searchable(),
                         Select::make('jenis')
                             ->label('')
@@ -107,5 +124,48 @@ class Dashboard extends \Filament\Pages\Dashboard
                         }),
                 ])
         ]);
+    }
+
+
+    public function boot()
+    {
+        // Render hook setelah konten utama dashboard selesai dimuat
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_END,
+            fn(): string => Blade::render($this->getExpiredDocumentsModal())
+        );
+    }
+
+    protected function getExpiredDocumentsModal(): ?string
+    {
+        if (! session('show_expired_modal')) {
+            return null;
+        }
+
+        // Hapus flag agar tidak muncul lagi setelah ditampilkan sekali
+        session()->forget('show_expired_modal');
+
+
+
+        return Blade::render('
+<script>
+    document.addEventListener("livewire:navigated", () => {
+        window.dispatchEvent(new CustomEvent("open-modal", { detail: { id: "expired-docs-modal" } }));
+    });
+</script>
+
+
+<x-filament::modal id="expired-docs-modal" width="5xl">
+    <x-slot name="heading">
+        📄 Dokumen Sudah Expired
+    </x-slot>
+    @livewire(\App\Filament\Document\Widgets\DocumentExpiredDashboard::class)
+    <x-slot name="footer">
+        <x-filament::button x-on:click="$dispatch(\'close-modal\', { id: \'expired-docs-modal\' })">
+            Tutup
+        </x-filament::button>
+    </x-slot>
+</x-filament::modal>
+');
     }
 }

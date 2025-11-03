@@ -13,7 +13,7 @@ class MutasiBerjalan extends ChartWidget
 {
 
     use InteractsWithPageFilters;
-        use HasWidgetShield;
+    use HasWidgetShield;
 
     protected static ?string $heading = 'Mutasi Berjalan';
     protected int | string | array $columnSpan = 2;
@@ -57,6 +57,11 @@ class MutasiBerjalan extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'responsive' => true,
+            'animation' => [
+                'duration' => 1000, // durasi animasi (ms)
+                'easing' => 'easeOutQuart', // gaya animasi
+            ],
             'scales' => [
                 'y' => [
 

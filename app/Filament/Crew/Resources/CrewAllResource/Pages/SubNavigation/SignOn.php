@@ -12,6 +12,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Actions\Action;
+use Hugomyb\FilamentMediaAction\Tables\Actions\MediaAction;
+use Illuminate\Support\Facades\Storage;
 
 class SignOn extends ManageRelatedRecords
 {
@@ -53,25 +55,48 @@ class SignOn extends ManageRelatedRecords
                         'Expired' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('end_date'),
-                Tables\Columns\TextColumn::make('file_path')
-                    ->label('File')
-                    ->badge()
-                    ->color('info')
-                    ->formatStateUsing(fn($state) => $state != null ? 'Download' : '')
-                    ->url(fn($record) => $record->file_path ? asset('storage/' . $record->file_path) : null, shouldOpenInNewTab: true),
             ])
             ->filters([
                 //
             ])
             ->headerActions([])
             ->actions([
-                Tables\Actions\DeleteAction::make()->button(),
+                Tables\Actions\Action::make('download')
+                    ->size('sm')
+                    ->color('success')
+                    ->button()
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->url(fn($record) => asset('storage/' . $record->file_path), shouldOpenInNewTab: true)
+                    ->visible(function ($record) {
+                        $path = $record->file_path ?? null;
+                        if (! $path) return false;
+                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                        return $extension != 'pdf';
+                    }),
+
+                MediaAction::make('priview')
+                    ->label('Priview')
+                    ->size('sm')
+                    ->color('success')
+                    ->button()
+                    ->icon('heroicon-o-eye')
+                    ->modalHeading(fn($record) => 'Sign On ' . $record->nomor_document)
+                    ->media(fn($record) => str_replace(' ', '%20', Storage::url($record->file_path)))
+                    ->visible(function ($record) {
+                        $path = $record->file_path ?? null;
+                        if (! $path) return false;
+                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                        return $extension === 'pdf';
+                    }),
+
                 Tables\Actions\Action::make('Detail')
                     ->button()
                     ->color('success')
                     ->icon('heroicon-o-eye')
                     ->url(fn($record) => CrewAllResource::getUrl('detail_pkl', ['record' => $record->id]))
-                    ->openUrlInNewTab(false)
+                    ->openUrlInNewTab(false),
+
+                Tables\Actions\DeleteAction::make()->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

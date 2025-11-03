@@ -2,13 +2,17 @@
 
 namespace App\Services;
 
+use App\Enums\StatusDocumentFile;
 use App\Enums\StatusKontrakCrew;
+use App\Mail\ReminderMail;
 use App\Models\CrewPkl;
+use App\Models\EmailReminderPkl;
 use App\Models\PklReminder;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Mail;
 
 class KontrakPklStatusService
 {
@@ -41,7 +45,7 @@ class KontrakPklStatusService
             if ($today->greaterThanOrEqualTo($endDate)) {
                 if ($crewPkl->status_kontrak !== StatusKontrakCrew::Expired->value) {
                     $crewPkl->update(['status_kontrak' => 'Expired']);
-                    $this->sendNotification($crewPkl, 'telah berakhir');
+                    $this->sendNotification($crewPkl, StatusDocumentFile::Expired->value,  $today);
                 }
                 return;
             }
@@ -52,7 +56,7 @@ class KontrakPklStatusService
             if ($today->greaterThanOrEqualTo($thirtyDaysBefore) && $today->lessThan($endDate)) {
                 if ($crewPkl->isNearExpiry !== true) {
                     $crewPkl->update(['isNearExpiry' => true]);
-                    $this->sendNotification($crewPkl, 'akan segera berakhir (kurang dari 30 hari status near expiry)');
+                    $this->sendNotification($crewPkl, StatusDocumentFile::NearExpiry->value,  $today);
                 }
                 return;
             }
@@ -78,14 +82,14 @@ class KontrakPklStatusService
                     }
 
                     if ($today->format('Y-m-d H:i') === $reminderDate->format('Y-m-d H:i')) {
-                        $this->sendNotification($crewPkl, 'hampir berakhir');
+                        $this->sendNotification($crewPkl, 'reminder',  $today);
                     }
                 }
             }
 
             if ($crewPkl->isNearExpiry !== false) {
                 $crewPkl->update(['isNearExpiry' => false]);
-                $this->sendNotification($crewPkl, 'UpToDate');
+                $this->sendNotification($crewPkl, StatusDocumentFile::UpToDate->value,  $today);
             }
         } catch (\Throwable $th) {
             \Log::error('Error updateStatus PKL', [
@@ -96,29 +100,54 @@ class KontrakPklStatusService
         }
     }
 
-    private function sendNotification(CrewPkl $crewPkl, string $message): void
+    private function sendNotification(CrewPkl $crewPkl, $status, $today): void
     {
-        try {
-            $recipient = User::whereHas('roles', function ($q) {
-                $q->whereIn('name', ['staff_crew', 'super_admin', 'manager_crew']);
-            })->get();
 
-            Notification::make()
-                ->title('Informasi Status Kontrak PKL')
-                ->body("Kontrak PKL dengan nomor dokumen {$crewPkl->nomor_document} {$message}")
-                ->success()
-                ->actions([
-                    Action::make('view')
-                        ->button()
-                        ->url(url("/crew/crew-all/{$crewPkl->id}/detail_kontak_pkl")),
-                ])
-                ->sendToDatabase($recipient);
-        } catch (\Throwable $th) {
-            \Log::error('Error updateStatus PKL', [
-                'crew_id' => $crewPkl->id,
-                'message' => $th->getMessage(),
-                'trace'   => $th->getTraceAsString(),
-            ]);
+        $recipient = User::whereHas('roles', function ($q) {
+            $q->whereIn('name', ['staff_crew', 'super_admin', 'manager_crew']);
+        })->get();
+
+        $title = 'Informasi Status Kontrak PKL';
+        $pesan = null;
+
+        switch ($status) {
+            case StatusDocumentFile::UpToDate->value:
+                $pesan = "status kontrak crew {$crewPkl->crew->nama_crew} dengan nomor {$crewPkl->nomor_document}, perusahaan {$crewPkl->perusahaan->nama_perusahaan}, kapal {$crewPkl->kapal->nama_kapal} telah diperbarui";
+                break;
+            case StatusDocumentFile::NearExpiry->value:
+                $pesan = "status kontrak crew {$crewPkl->crew->nama_crew} dengan nomor {$crewPkl->nomor_document}, perusahaan {$crewPkl->perusahaan->nama_perusahaan}, kapal {$crewPkl->kapal->nama_kapal} akan segera berakhir pada {$crewPkl->tanggal_expired}. Mohon diperiksa dan diperbarui jika diperlukan.";
+                break;
+            case StatusDocumentFile::Expired->value:
+                $pesan = "status kontrak crew {$crewPkl->crew->nama_crew} dengan nomor {$crewPkl->nomor_document}, perusahaan {$crewPkl->perusahaan->nama_perusahaan}, kapal {$crewPkl->kapal->nama_kapal} telah kadaluarsa pada {$crewPkl->tanggal_expired}. Segera lakukan tindakan untuk memperbarui kontrak dokumen.";
+                break;
+
+            default:
+                $pesan = "status kontrak crew {$crewPkl->crew->nama_crew} dengan nomor {$crewPkl->nomor_document}, perusahaan {$crewPkl->perusahaan->nama_perusahaan}, kapal {$crewPkl->kapal->nama_kapal} saat ini sudah hampir berakhir. Segera lakukan pengecekan dan permbaruan jika diperlukan";
+                break;
         }
+
+        Notification::make()
+            ->title($title)
+            ->body($pesan)
+            ->success()
+            ->actions([
+                Action::make('view')
+                    ->button()
+                    ->url(url("/crew/crew-all/{$crewPkl->id}/detail_kontak_pkl")),
+            ])
+            ->sendToDatabase($recipient);
+
+        EmailReminderPkl::chunk(100, function ($emailsChunk) use ($today, $crewPkl, $pesan, $status) {
+            foreach ($emailsChunk as $mails) {
+                Mail::to($mails->email)
+                    ->queue(new ReminderMail(
+                        nama: $mails->nama,
+                        url: url("/crew/crew-all/{$crewPkl->id}/detail_kontak_pkl"),
+                        ceks: $pesan,
+                        status: $status,
+                        datetime: $today->format('d M Y'),
+                    ));
+            }
+        });
     }
 }

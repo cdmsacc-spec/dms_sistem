@@ -31,7 +31,7 @@ class PenggolonganUsia extends ChartWidget
             END as kategori_usia,
             COUNT(*) as total
         ")
-           
+
             ->groupBy('kategori_usia')
             ->pluck('total', 'kategori_usia')
             ->toArray();
@@ -61,6 +61,11 @@ class PenggolonganUsia extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'responsive' => true,
+            'animation' => [
+                'duration' => 1000, // durasi animasi (ms)
+                'easing' => 'easeOutQuart', // gaya animasi
+            ],
             'scales' => [
                 'y' => [
                     'ticks' => [

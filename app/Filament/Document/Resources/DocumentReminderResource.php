@@ -27,10 +27,10 @@ class DocumentReminderResource extends Resource
             ->emptyStateHeading('Tidak Ada Data')
             ->defaultSort('created_at', 'desc')
             ->emptyStateDescription('belum ada data ditambahkan')
-            ->defaultGroup('document.nomor_dokumen')
+            ->defaultGroup('document.kapal.nama_kapal')
             ->groups([
-                Group::make('document.nomor_dokumen')
-                    ->label('document')
+                Group::make('document.kapal.nama_kapal')
+                    ->label('')
                     ->collapsible(),
             ])
             ->groupingSettingsHidden()
@@ -59,9 +59,7 @@ class DocumentReminderResource extends Resource
             ], layout: FiltersLayout::AboveContent)
             ->actions([])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+              
             ]);
     }
 

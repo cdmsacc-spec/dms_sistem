@@ -16,6 +16,8 @@ return new class extends Migration
             $table->text('nama_perusahaan');
             $table->text('kode_perusahaan');
             $table->longText('alamat');
+            $table->string('file_path')->nullable();
+            $table->text('keterangan')->nullable();
             $table->string('email')->nullable()->default(null);
             $table->string('telepon')->nullable()->default(null);
             $table->string('npwp')->nullable()->default(null);

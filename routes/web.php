@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\GenerateFormController;
 use App\Http\Controllers\LogoutController;
+use App\Mail\ReminderMail;
 use Illuminate\Support\Facades\Route;
+use PhpOffice\PhpWord\IOFactory;
 
 Route::get('/', function () {
     return view('welcome');
@@ -22,3 +24,4 @@ Route::get('generate/signoff', [GenerateFormController::class, 'generateFormSign
 
 Route::get('generate/promosi', [GenerateFormController::class, 'generateFormPromosi'])
     ->name('generate.promosi');
+

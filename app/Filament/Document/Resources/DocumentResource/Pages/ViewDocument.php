@@ -6,6 +6,7 @@ use App\Filament\Document\Resources\DocumentExpirationResource;
 use App\Filament\Document\Resources\DocumentResource;
 use App\Models\DocumentExpiration;
 use App\Models\DocumentReminder;
+use App\Models\User;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\Grid;
@@ -17,8 +18,8 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\Page;
 use Filament\Support\Enums\ActionSize;
 use Illuminate\Support\Carbon;
-use Parallax\FilamentComments\Infolists\Components\CommentsEntry;
 use Filament\Actions\EditAction;
+use Kirschbaum\Commentions\Filament\Infolists\Components\CommentsEntry;
 
 class ViewDocument extends ViewRecord
 {
@@ -102,7 +103,7 @@ class ViewDocument extends ViewRecord
             // === Info dasar dokumen ===
             Grid::make(2)
                 ->schema([
-                    TextEntry::make('nomor_dokumen'),
+                    TextEntry::make('latestExpiration.nomor_dokumen'),
                     TextEntry::make('jenisDocument.nama_dokumen'),
                     TextEntry::make('penerbit'),
                     TextEntry::make('tempat_penerbitan'),
@@ -186,6 +187,12 @@ class ViewDocument extends ViewRecord
 
                                     return $datesWithTime->implode(', ');
                                 }),
+
+                            TextEntry::make('reminderemail.email')
+                                ->label('Reminder Email')
+                                ->badge()
+                                ->color('warning')
+                                ->placeholder('Tanpa Reminder')
                         ]),
                 ]),
 
@@ -240,8 +247,15 @@ class ViewDocument extends ViewRecord
             // === Komentar Dokumen ===
             Section::make('Komentar')
                 ->schema([
-                    CommentsEntry::make('filament_comments')
-                        ->columnSpanFull(),
+                    CommentsEntry::make('comments')
+                        ->disableSidebar()
+                        ->perPage(10)
+                        ->mentionables(
+                            User::whereHas('roles', function ($q) {
+                                $q->whereIn('name', ['staff_document', 'super_admin', 'manager_document', 'operation']);
+                            })->get()
+                        )
+
                 ]),
         ]);
     }

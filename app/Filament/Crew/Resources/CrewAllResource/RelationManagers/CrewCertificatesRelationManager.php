@@ -8,9 +8,11 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Hugomyb\FilamentMediaAction\Tables\Actions\MediaAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class CrewCertificatesRelationManager extends RelationManager
 {
@@ -100,12 +102,6 @@ class CrewCertificatesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('tanggal_dikeluarkan'),
                 Tables\Columns\TextColumn::make('tanggal_expired'),
                 Tables\Columns\TextColumn::make('status'),
-                Tables\Columns\TextColumn::make('file_path')
-                    ->label('File')
-                    ->badge()
-                    ->color('info')
-                    ->formatStateUsing(fn($state) => $state != null ? 'Download' : '')
-                    ->url(fn($record) => $record->file_path ? asset('storage/' . $record->file_path) : null, shouldOpenInNewTab: true),
             ])
             ->filters([
                 //
@@ -120,8 +116,35 @@ class CrewCertificatesRelationManager extends RelationManager
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('download')
+                    ->size('sm')
+                    ->color('success')
+                    ->button()
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->url(fn($record) => asset('storage/' . $record->file_path), shouldOpenInNewTab: true)
+                    ->visible(function ($record) {
+                        $path = $record->file_path ?? null;
+                        if (! $path) return false;
+                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                        return $extension != 'pdf';
+                    }),
+
+                MediaAction::make('priview')
+                    ->label('Priview')
+                    ->size('sm')
+                    ->color('success')
+                    ->button()
+                    ->icon('heroicon-o-eye')
+                    ->modalHeading(fn($record) => $record->nama_sertifikat)
+                    ->media(fn($record) => str_replace(' ', '%20', Storage::url($record->file_path)))
+                    ->visible(function ($record) {
+                        $path = $record->file_path ?? null;
+                        if (! $path) return false;
+                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                        return $extension === 'pdf';
+                    }),
+                Tables\Actions\EditAction::make()->button(),
+                Tables\Actions\DeleteAction::make()->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -27,6 +27,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 use Rmsramos\Activitylog\ActivitylogPlugin;
+use SolutionForest\FilamentSimpleLightBox\SimpleLightBoxPlugin;
 
 class CrewPanelProvider extends PanelProvider
 {
@@ -82,7 +83,7 @@ class CrewPanelProvider extends PanelProvider
                 FilamentEditProfilePlugin::make()
                     ->shouldShowAvatarForm(
                         value: true,
-                         directory: 'user/profile',
+                        directory: 'user/profile',
                         rules: 'mimes:jpeg,png'
                     )
                     ->canAccess(fn() => auth()->user()?->can('page_EditProfilePage'))

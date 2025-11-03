@@ -255,16 +255,20 @@ class CrewAllResource extends Resource
                 \Filament\Tables\Filters\SelectFilter::make('status_proses')
                     ->label('Status')
                     ->native(false)
+                    ->searchable()
+                    ->preload()
                     ->options(
                         StatusCrew::options()
                     ),
                 \Filament\Tables\Filters\SelectFilter::make('jabatan')
                     ->label('Jabatan')
                     ->native(false)
+                    ->searchable()
+                    ->preload()
                     ->options(function () {
                         return Jabatan::get()->pluck('golongan', 'golongan')->toArray();
                     })
-                    
+
                     ->query(function ($query, $data) {
                         if (empty($data['value'])) return;
 
@@ -278,6 +282,8 @@ class CrewAllResource extends Resource
                 \Filament\Tables\Filters\SelectFilter::make('perusahaaan')
                     ->label('Perusahaan')
                     ->native(false)
+                    ->searchable()
+                    ->preload()
                     ->options(function () {
                         return Perusahaan::get()->pluck('nama_perusahaan', 'nama_perusahaan')->toArray();
                     })

@@ -9,6 +9,7 @@ class DocumentExpiration extends Model
 {
     protected $fillable = [
         'document_id',
+        'nomor_dokumen',
         'tanggal_terbit',
         'tanggal_expired',
         'file_path',

@@ -24,7 +24,7 @@ class LoginAdmin extends Login
         return 'Login';
     }
 
-        public function authenticate(): LoginResponse
+    public function authenticate(): LoginResponse
     {
         // Panggil parent untuk melakukan autentikasi
         $response = parent::authenticate();
@@ -40,8 +40,8 @@ class LoginAdmin extends Login
             ])
             ->event('login')
             ->log('User logged in');
-
-        return $response; 
+        session(['showExpiredModalAfterLogin' => true]);
+        return $response;
     }
 
     protected function throwFailureValidationException(): never

@@ -20,6 +20,16 @@ use Filament\Tables\Table;
 use Filament\Pages\SubNavigationPosition;
 use Illuminate\Support\Carbon;
 use Filament\Tables\Grouping\Group;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Hugomyb\FilamentMediaAction\Tables\Actions\MediaAction;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpWord\Shared\ZipArchive;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use ZipStream\ZipStream;
 
 class DocumentResource extends Resource
 {
@@ -116,7 +126,7 @@ class DocumentResource extends Resource
                 // =============================
                 Forms\Components\Section::make('Document')
                     ->schema([
-                        Forms\Components\Grid::make(3)
+                        Forms\Components\Grid::make(2)
                             ->schema([
 
                                 // Jenis Dokumen
@@ -125,11 +135,6 @@ class DocumentResource extends Resource
                                     ->preload()
                                     ->relationship('jenisDocument', 'nama_dokumen')
                                     ->native(false)
-                                    ->required(),
-
-                                // Nomor Dokumen
-                                Forms\Components\TextInput::make('nomor_dokumen')
-                                    ->unique(ignorable: fn($record) => $record)
                                     ->required(),
 
                                 // Status
@@ -165,8 +170,9 @@ class DocumentResource extends Resource
                 // =============================
                 Forms\Components\Section::make(request()->boolean('renew') == true ? 'Renew Document' : 'Add Document')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Forms\Components\Grid::make(3)
                             ->schema([
+
                                 // Tanggal Terbit
                                 Forms\Components\DatePicker::make('tanggal_terbit')
                                     ->label('Tanggal Terbit')
@@ -206,7 +212,10 @@ class DocumentResource extends Resource
                                                 $set('tanggal_expired', $exp->tanggal_expired);
                                             }
                                         }
-                                    })
+                                    }),
+                                // Nomor Dokumen
+                                Forms\Components\TextInput::make('nomor_dokumen')
+                                    ->dehydrated(false),
                             ]),
 
                         // Upload File
@@ -259,7 +268,43 @@ class DocumentResource extends Resource
                     ->columns(2)
                     ->grid(3)
                     ->columnSpanFull(),
+
+                Forms\Components\Repeater::make('reminderemail')
+                    ->label('Reminder Email Settings')
+                    ->relationship('reminderemail') // relasi hasMany di model DocumentExpiration
+                    ->schema([
+                        Forms\Components\TextInput::make('nama')
+                            ->label('Nama')
+                            ->required(),
+                        Forms\Components\TextInput::make('email')
+                            ->label('Email')
+                            ->email()
+                            ->required(),
+                    ])
+                    ->hidden(fn($get) => $get('tanggal_expired') == null ? true : false)
+                    ->addActionLabel('Add Email')
+                    ->addActionAlignment(Alignment::Start)
+                    ->collapsible()
+                    ->columns(1)
+                    ->grid(3)
+                    ->columnSpanFull(),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->leftJoin(\DB::raw(
+                'LATERAL (
+                SELECT de.tanggal_expired
+                FROM document_expirations de
+                WHERE de.document_id = documents.id
+                ORDER BY de.id DESC
+                LIMIT 1
+            ) AS latest_de'
+            ), \DB::raw('true'), '=', \DB::raw('true'))
+            ->addSelect('documents.*')
+            ->addSelect(\DB::raw('(latest_de.tanggal_expired - CURRENT_DATE) AS jarak_hari'));
     }
 
     public static function table(Table $table): Table
@@ -283,17 +328,16 @@ class DocumentResource extends Resource
             ->emptyStateDescription('belum ada data ditambahkan')
             ->columns([
                 Tables\Columns\TextColumn::make('kapal.perusahaan.nama_perusahaan')
-                    ->icon('heroicon-o-building-office')
-                    ->color('info')
-                    ->searchable(),
+                    ->searchable()
+                    ->formatStateUsing(fn($state) => "<strong>{$state}</strong>")
+                    ->html(),
                 Tables\Columns\TextColumn::make('kapal.nama_kapal')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('jenisDocument.nama_dokumen')
                     ->label('Jenis')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('nomor_dokumen')
-                    ->label('Nomor')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('latestExpiration.nomor_dokumen')
+                    ->label('Nomor Dokumen'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn($state) => match ($state) {
@@ -301,24 +345,75 @@ class DocumentResource extends Resource
                         'Near Expiry' => 'warning',
                         default       => 'danger',
                     })->sortable(),
+                Tables\Columns\TextColumn::make('jarak_hari')
+                    ->label('Jarak hari expired')
+                    ->sortable()
+                    ->getStateUsing(
+                        fn($record) => $record->jarak_hari !== null
+                            ? $record->jarak_hari . ' hari'
+                            : 'Tanpa Expired'
+                    ),
                 Tables\Columns\TextColumn::make('last_comment')->html()
             ])
             ->filters([
-                SelectFilter::make('perusahaan')
-                    ->searchable()
-                    ->label('Perusahaan')
-                    ->native(false)
-                    ->relationship('kapal.perusahaan', 'nama_perusahaan')
-                    ->getOptionLabelFromRecordUsing(fn($record): string =>  $record->nama_perusahaan)
-                    ->preload(),
+                Filter::make('kapal_perusahaan')
+                    ->columnSpan(2)
+                    ->columns(2)
 
-                SelectFilter::make('kapal')
-                    ->searchable()
-                    ->label('Kapal')
-                    ->native(false)
-                    ->relationship('kapal', 'nama_kapal')
-                    ->getOptionLabelFromRecordUsing(fn($record): string =>  $record->nama_kapal)
-                    ->preload(),
+                    ->form([
+                        Select::make('perusahaan')
+                            ->label('Perusahaan')
+                            ->options(Perusahaan::pluck('nama_perusahaan', 'id')->toArray())
+                            ->reactive()
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->columnSpan(1)
+                            ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, $state) {
+
+                                if (empty($state)) {
+                                    $set('kapal', null);
+                                }
+                            }),
+                        Select::make('kapal')
+                            ->label('Kapal')
+                            ->columnSpan(1)
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->options(function (callable $get) {
+                                $perusahaanId = $get('perusahaan');
+                                if ($perusahaanId) {
+                                    return Namakapal::where('perusahaan_id', $perusahaanId)
+                                        ->pluck('nama_kapal', 'id')
+                                        ->toArray();
+                                }
+                                return [];
+                            })
+                    ])
+                    ->query(function ($query, array $data) {
+                        if (!empty($data['perusahaan'])) {
+                            $query->whereHas('kapal.perusahaan', fn($q) => $q->where('id', $data['perusahaan']));
+                        }
+                        if (!empty($data['kapal'])) {
+                            $query->where('kapal_id', $data['kapal']);
+                        }
+                    })
+                    ->indicateUsing(function (array $data): ?string {
+                        $texts = [];
+
+                        if (!empty($data['perusahaan'])) {
+                            $namaPerusahaan = Perusahaan::find($data['perusahaan'])->nama_perusahaan ?? '—';
+                            $texts[] = "Perusahaan: {$namaPerusahaan}";
+                        }
+
+                        if (!empty($data['kapal'])) {
+                            $namaKapal = Namakapal::find($data['kapal'])->nama_kapal ?? '—';
+                            $texts[] = "Kapal: {$namaKapal}";
+                        }
+
+                        return $texts ? implode(', ', $texts) : null;
+                    }),
 
                 SelectFilter::make('jenis_document')
                     ->label('Jenis Document')
@@ -341,6 +436,30 @@ class DocumentResource extends Resource
             ], layout: FiltersLayout::AboveContent)
             ->filtersFormColumns(4)
             ->actions([
+                Tables\Actions\Action::make('download')
+                    ->size('sm')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->url(fn($record) => asset('storage/' . $record->latestExpiration->file_path), shouldOpenInNewTab: true)
+                    ->visible(function ($record) {
+                        $path = $record->latestExpiration->file_path ?? null;
+                        if (! $path) return false;
+                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                        return $extension != 'pdf';
+                    }),
+
+                MediaAction::make('priview')
+                    ->label('Priview‎ ‎ ')
+                    ->size('sm')
+                    ->icon('heroicon-o-eye')
+                    ->modalHeading(fn($record) => $record->kapal->nama_kapal)
+                    ->media(fn($record) => str_replace(' ', '%20', Storage::url($record->latestExpiration->file_path)))
+                    ->visible(function ($record) {
+                        $path = $record->latestExpiration->file_path ?? null;
+                        if (! $path) return false;
+                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                        return $extension === 'pdf';
+                    }),
+
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make()
                         ->label('Renew')
@@ -353,7 +472,43 @@ class DocumentResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                       ,
+                    Tables\Actions\BulkAction::make('Download File')
+                        ->icon('heroicon-m-arrow-down-tray')
+                        ->color('success')
+                        ->openUrlInNewTab()
+                        ->deselectRecordsAfterCompletion()
+                        ->action(function ($records) {
+                            $currentDate = now()->format('Y-m-d_H-i-s');
+                            $zipFileName = "{$currentDate}". "_documents.zip";
+
+                            return new StreamedResponse(function () use ($records) {
+                                $zip = new ZipStream();
+
+                                foreach ($records as $record) {
+                                    $filePath = optional($record->latestExpiration)->file_path;
+                                    if (! $filePath) continue;
+
+                                    $disk = Storage::disk('public');
+                                    $filePath = ltrim($filePath, '/');
+
+                                    if ($disk->exists($filePath)) {
+                                        $absolutePath = $disk->path($filePath);
+                                        $safeName = preg_replace('/[^A-Za-z0-9_\-.]/', '_', $record->name ?? basename($filePath));
+                                        $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+                                        $fileNameInZip = "{$safeName}.{$ext}";
+
+                                        $zip->addFileFromPath($fileNameInZip, $absolutePath);
+                                    }
+                                }
+
+                                $zip->finish();
+                            }, 200, [
+                                'Content-Type' => 'application/zip',
+                                'Content-Disposition' => 'attachment; filename="' . $zipFileName . '"',
+                            ]);
+                        }),
                 ]),
             ]);
     }

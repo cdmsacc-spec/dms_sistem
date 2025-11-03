@@ -34,6 +34,7 @@ class LookupResource extends Resource
                     ->native(false)
                     ->options([
                         'Document' => 'Document',
+                        'Certified' => 'Certified',
                     ])
                     ->reactive(), // penting supaya trigger perubahan
 
@@ -46,11 +47,13 @@ class LookupResource extends Resource
                             'Document' => [
                                 'Document Near Expiry' => 'Document Near Expiry',
                             ],
+                            'Certified' => [
+                                'Certified Kapal' => 'Certified Kapal'
+                            ],
 
                             default => [],
                         };
                     })
-                    ->unique(ignorable: fn ($record) => $record)
                     ->reactive(),
 
                 TextInput::make('value')
@@ -64,7 +67,7 @@ class LookupResource extends Resource
             ->groupingSettingsHidden()
             ->emptyStateHeading('Tidak Ada Data')
             ->emptyStateDescription('belum ada data ditambahkan')
-            ->modifyQueryUsing(fn(Builder $query) => $query->where('kategori', 'Document')
+            ->modifyQueryUsing(fn(Builder $query) => $query->whereIn('kategori', ['Document', 'Certified'])
                 ->orderBy('kategori')
                 ->orderBy('code'))
             ->columns([

@@ -16,4 +16,9 @@ class ManagePklReminders extends ManageRecords
             Actions\CreateAction::make()->label('Add Reminder')->modalHeading('Create Reminder'),
         ];
     }
+
+    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return 'Reminder';
+    }
 }

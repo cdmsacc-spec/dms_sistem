@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('kapal_id')->constrained('nama_kapals')->noActionOnDelete();
             $table->foreignId('jenis_dokumen_id')->nullable()->constrained('jenis_documents')->nullOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('nomor_dokumen');
             $table->longText('keterangan')->nullable()->default(null);
             $table->string('penerbit');
             $table->string('tempat_penerbitan');

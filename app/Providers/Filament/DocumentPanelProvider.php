@@ -15,6 +15,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -25,6 +26,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 use Rmsramos\Activitylog\ActivitylogPlugin;
+use SolutionForest\FilamentSimpleLightBox\SimpleLightBoxPlugin;
 
 class DocumentPanelProvider extends PanelProvider
 {
@@ -45,7 +47,7 @@ class DocumentPanelProvider extends PanelProvider
             ->colors([
                 'info' => Color::hex('#3bc4ff'),
                 'warning' => Color::hex('#EDBC1C'),
-                'success' => Color::hex('#1CED23'),
+                'success' => Color::hex('#230bbd'),
                 'danger' => Color::hex('#ED1C1C'),
                 'primary' => Color::hex('#003366')
             ])
@@ -89,6 +91,7 @@ class DocumentPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+          
             ->viteTheme('resources/css/filament/staff_crew/theme.css');
     }
 }
