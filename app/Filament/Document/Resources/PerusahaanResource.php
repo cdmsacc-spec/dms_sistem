@@ -109,6 +109,8 @@ class PerusahaanResource extends Resource
                 MediaAction::make('priview')
                     ->label('Priview‎ ‎ ')
                     ->size('sm')
+                    ->button()
+                    ->color('warning')
                     ->icon('heroicon-o-eye')
                     ->modalHeading(fn($record) => $record->nama_perusahaan)
                     ->media(fn($record) => str_replace(' ', '%20', Storage::url($record->file_path)))
