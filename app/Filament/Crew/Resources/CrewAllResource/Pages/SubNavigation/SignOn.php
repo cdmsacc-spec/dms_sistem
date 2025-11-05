@@ -74,11 +74,12 @@ class SignOn extends ManageRelatedRecords
                         return $extension != 'pdf';
                     }),
 
-                MediaAction::make('priview')
-                    ->label('Priview')
+                MediaAction::make('Preview')
+                    ->label('Preview')
                     ->size('sm')
                     ->color('success')
                     ->button()
+                    ->modalWidth('100%')
                     ->icon('heroicon-o-eye')
                     ->modalHeading(fn($record) => 'Sign On ' . $record->nomor_document)
                     ->media(fn($record) => str_replace(' ', '%20', Storage::url($record->file_path)))

@@ -447,10 +447,11 @@ class DocumentResource extends Resource
                         return $extension != 'pdf';
                     }),
 
-                MediaAction::make('priview')
-                    ->label('Priview‎ ‎ ')
+                MediaAction::make('Preview')
+                    ->label('Preview‎ ‎ ')
                     ->size('sm')
                     ->icon('heroicon-o-eye')
+                    ->modalWidth('100%')
                     ->modalHeading(fn($record) => $record->kapal->nama_kapal)
                     ->media(fn($record) => str_replace(' ', '%20', Storage::url($record->latestExpiration->file_path)))
                     ->visible(function ($record) {

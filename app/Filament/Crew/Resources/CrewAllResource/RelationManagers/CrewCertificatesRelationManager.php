@@ -129,11 +129,12 @@ class CrewCertificatesRelationManager extends RelationManager
                         return $extension != 'pdf';
                     }),
 
-                MediaAction::make('priview')
-                    ->label('Priview')
+                MediaAction::make('Preview')
+                    ->label('Preview')
                     ->size('sm')
                     ->color('success')
                     ->button()
+                    ->modalWidth('100%')
                     ->icon('heroicon-o-eye')
                     ->modalHeading(fn($record) => $record->nama_sertifikat)
                     ->media(fn($record) => str_replace(' ', '%20', Storage::url($record->file_path)))

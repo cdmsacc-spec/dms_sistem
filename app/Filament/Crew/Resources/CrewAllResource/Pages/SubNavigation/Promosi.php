@@ -62,6 +62,7 @@ class Promosi extends ManageRelatedRecords
                     ->size('sm')
                     ->color('success')
                     ->button()
+                    ->modalWidth('100%')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->url(fn($record) => asset('storage/' . $record->file_path), shouldOpenInNewTab: true)
                     ->visible(function ($record) {
@@ -71,8 +72,8 @@ class Promosi extends ManageRelatedRecords
                         return $extension != 'pdf';
                     }),
 
-                MediaAction::make('priview')
-                    ->label('Priview')
+                MediaAction::make('Preview')
+                    ->label('Preview')
                     ->size('sm')
                     ->color('success')
                     ->button()

@@ -121,8 +121,8 @@ class NamaKapalResource extends Resource
                         return $extension != 'pdf';
                     }),
 
-                MediaAction::make('priview')
-                    ->label('Priview‎ ‎ ')
+                MediaAction::make('Preview')
+                    ->label('Preview‎ ‎ ')
                     ->size('sm')
                     ->button()
                     ->color('warning')

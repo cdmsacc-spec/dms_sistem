@@ -76,8 +76,9 @@ class ViewDocumentExpiration extends Page implements Tables\Contracts\HasTable
                     $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
                     return $extension != 'pdf';
                 }),
-            MediaAction::make('priview')
+            MediaAction::make('Preview')
                 ->button()
+                ->modalWidth('100%')
                 ->icon('heroicon-o-eye')
                 ->modalHeading(fn($record) => $record->nomor_dokumen)
                 ->media(fn($record) => str_replace(' ', '%20', Storage::url($record->file_path)))
