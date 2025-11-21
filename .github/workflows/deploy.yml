@@ -1,0 +1,154 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo, pdo_mysql, pdo_pgsql, gd, bcmath
+          coverage: none
+
+      - name: Validate composer.json & composer.lock
+        run: composer validate --no-check-all
+
+      # Kita tidak perlu bawa vendor ke server; install di server saja
+      - name: Install dependencies (no-dev) for autoload dump check
+        run: composer install --no-interaction --prefer-dist --no-progress --no-dev --optimize-autoloader
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Frontend build (pnpm/yarn/npm autodetect)
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            corepack enable
+            pnpm i --frozen-lockfile
+            pnpm run build
+          elif [ -f yarn.lock ]; then
+            corepack enable
+            yarn install --frozen-lockfile
+            yarn build
+          elif [ -f package-lock.json ]; then
+            npm ci
+            npm run build
+          else
+            echo "No frontend build step"
+          fi
+
+      - name: Package artifact
+        run: |
+          rm -rf .git tests node_modules vendor
+          tar -czf ../app.tar.gz ./
+          mv ../app.tar.gz .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: app.tar.gz
+
+  deploy:
+    name: Deploy to Production
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app
+          path: .
+
+      - name: Install ssh key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add host to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Upload & extract release
+        run: |
+          REL=$(date +%Y%m%d%H%M%S)-${GITHUB_SHA::7}
+          echo "RELEASE=$REL" >> $GITHUB_ENV
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.APP_DIR }}/releases/$REL"
+          scp -P "${{ secrets.SSH_PORT }}" app.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.APP_DIR }}/releases/$REL/
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.APP_DIR }}/releases/$REL && tar -xzf app.tar.gz && rm app.tar.gz"
+
+      - name: Write .env (from secret)
+        env:
+          ENV_PROD: ${{ secrets.ENV_PROD }}
+        run: |
+          printf "%s" "$ENV_PROD" > .env.local
+          scp -P "${{ secrets.SSH_PORT }}" .env.local "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.APP_DIR }}/releases/$RELEASE/.env"
+          rm -f .env.local
+          ssh -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "chmod 600 '${{ secrets.APP_DIR }}/releases/$RELEASE/.env'"
+
+      - name: Composer install & Laravel optimize (server)
+        run: |
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          set -e
+          cd ${{ secrets.APP_DIR }}/releases/$RELEASE
+          # pastikan php8.2 dipakai
+          php -v
+          which composer || (curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer)
+          composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+          php artisan key:generate --force || true
+          php artisan storage:link || true
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          # permissions untuk Nginx/PHP-FPM
+          chown -R ${USER}:${USER} . || true
+          chgrp -R www-data storage bootstrap/cache || true
+          chmod -R ug+rwx storage bootstrap/cache
+          "
+
+      - name: Migrate DB
+        run: |
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          set -e
+          cd ${{ secrets.APP_DIR }}/releases/$RELEASE
+          php artisan migrate --force
+          "
+
+      - name: Activate release (symlink swap)
+        run: |
+          ssh -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
+          set -e
+          ln -sfn '${{ secrets.APP_DIR }}/releases/$RELEASE' '${{ secrets.APP_DIR }}/current'
+          sudo -n systemctl reload php8.2-fpm || sudo -n systemctl reload php8.3-fpm || true
+          sudo -n systemctl reload nginx || true
+          "
+          
+      - name: Restart queues (if any)
+        run: |
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          cd ${{ secrets.APP_DIR }}/current
+          php artisan queue:restart || true
+          sudo supervisorctl reread || true
+          sudo supervisorctl update || true
+          "
+
+      - name: Prune old releases (keep last 5)
+        run: |
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          cd ${{ secrets.APP_DIR }}/releases
+          ls -1t | tail -n +6 | xargs -r rm -rf
+          "

@@ -1,0 +1,147 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+.fi-logo{
+    @apply text-white;
+}
+
+.fi-topbar {
+    @apply bg-blue-600;
+}
+
+.fi-topbar-open-sidebar-btn{
+    @apply text-white;
+} 
+
+.fi-topbar .fi-icon-btn{
+    @apply text-white;
+}
+
+.fi-global-search-field .fi-input-wrp{
+    @apply bg-white;
+}
+
+.dark .fi-global-search-field .fi-input-wrp{
+    @apply bg-white;
+}
+
+.fi-global-search-field .fi-icon{
+    @apply text-blue-600;
+}
+
+.fi-global-search-field .fi-input-wrp-content-ctn{
+     @apply text-white placeholder:fill-blue-50; 
+}
+
+.dark .fi-global-search-field .fi-icon{
+    @apply text-blue-600;
+}
+
+.dark .fi-global-search-field .fi-input-wrp-content-ctn{
+     @apply text-white placeholder:fill-stone-200; 
+}
+
+.fi-sidebar {
+    @apply bg-white;
+}
+
+.dark .fi-sidebar {
+    @apply bg-black;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn{
+   @apply bg-blue-600;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn span{
+    @apply text-white;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn svg{
+    @apply text-white;
+}
+
+.fi-wi-stats-overview-stat.stats-Total.Dokumen span{
+    @apply text-blue-600;
+}
+.fi-wi-stats-overview-stat.stats-Total.Dokumen svg{
+    @apply text-blue-600;
+}
+
+.fi-wi-stats-overview-stat.stats-Uptodate span{
+    @apply text-green-600;
+}
+.fi-wi-stats-overview-stat.stats-Uptodate svg{
+    @apply text-green-600;
+}
+
+.fi-wi-stats-overview-stat.stats-Near.Expiry span{
+    @apply text-yellow-600;
+}
+.fi-wi-stats-overview-stat.stats-Near.Expiry svg{
+    @apply text-yellow-600;
+}
+
+.fi-wi-stats-overview-stat.stats-Expired span{
+    @apply text-red-600;
+}
+.fi-wi-stats-overview-stat.stats-Expired svg{
+    @apply text-red-600;
+}
+
+
+.fi-wi-stats-overview-stat.stats-Crew span{
+    @apply text-blue-600;
+}
+.fi-wi-stats-overview-stat.stats-Crew svg{
+    @apply text-blue-600;
+}
+
+.fi-wi-stats-overview-stat.stats-Crew.Standby span{
+    @apply text-yellow-600;
+}
+.fi-wi-stats-overview-stat.stats-Crew.Standby svg{
+    @apply text-yellow-600;
+}
+
+.fi-wi-stats-overview-stat.stats-Crew.Sign.On span{
+    @apply text-green-600;
+}
+.fi-wi-stats-overview-stat.stats-Crew.Sign.On svg{
+    @apply text-green-600;
+}
+
+.fi-wi-stats-overview-stat.stats-Crew.Sign.Off span{
+    @apply text-red-600;
+}
+.fi-wi-stats-overview-stat.stats-Crew.Sign.Off svg{
+    @apply text-red-600;
+}
+
+
+
+
+.fi-sc-section.section-filter-dashboard {
+    @apply ring-slate-50 bg-slate-50;
+}
+.dark .fi-sc-section.section-filter-dashboard{
+    @apply ring-black  bg-black;   
+}
+
+.fi-sc-section.section-filter-dashboard header{
+    @apply rounded-tr-xl rounded-tl-xl bg-blue-600;
+}
+
+.fi-sc-section.section-filter-dashboard h2{
+    @apply text-white;
+}
+
+.fi-sc-section.section-filter-dashboard .fi-section-header-after-ctn button{
+    @apply text-white;
+}
+.fi-sc-section.section-filter-dashboard .fi-section-header-after-ctn button svg{
+    @apply text-white;
+}
+

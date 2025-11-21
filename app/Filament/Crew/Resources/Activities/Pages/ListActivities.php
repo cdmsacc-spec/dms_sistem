@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Filament\Crew\Resources\Activities\Pages;
+
+use App\Filament\Crew\Resources\Activities\ActivitiesResource;
+use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
+
+class ListActivities extends ListRecords
+{
+    protected static string $resource = ActivitiesResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+        ];
+    }
+}

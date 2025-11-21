@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Filament\Document\Resources\Notifications;
+
+use App\Filament\Document\Resources\Notifications\Pages\CreateNotification;
+use App\Filament\Document\Resources\Notifications\Pages\EditNotification;
+use App\Filament\Document\Resources\Notifications\Pages\ListNotifications;
+use App\Filament\Document\Resources\Notifications\Schemas\NotificationForm;
+use App\Filament\Document\Resources\Notifications\Tables\NotificationsTable;
+use App\Models\Notification;
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
+
+class NotificationResource extends Resource
+{
+    protected static ?string $model = Notification::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::BellAlert;
+
+    protected static ?string $recordTitleAttribute = 'type';
+    protected static ?string $navigationLabel = "Notifikasi";
+    protected static ?string $pluralModelLabel = "Notifikasi";
+    protected static ?string $permissionGroup = 'User';
+
+    public static function form(Schema $schema): Schema
+    {
+        return NotificationForm::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return NotificationsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListNotifications::route('/'),
+            'create' => CreateNotification::route('/create'),
+            'edit' => EditNotification::route('/{record}/edit'),
+        ];
+    }
+}
