@@ -105,7 +105,7 @@ class AuthController extends Controller
                 "name" => $data["name"],
                 "email" => $data["email"],
                 "email_verified_at" => $data["email_verified_at"],
-                "avatar" => $data["avatar"] == null ? null : url('storage/' .  $data["avatar"]) ?? null,
+                "avatar" => $data["avatar"] == null ?  url('storage/crew/avatar/default.jpg') : url('storage/' .  $data["avatar"]) ?? null,
                 "auth_token" => $data["auth_token"],
                 "roles" => $data["roles"]->pluck('name'),
 
