@@ -57,7 +57,7 @@ class CrewController extends Controller
                     'email' => $item->email,
                     'status_identitas' => $item->status_identitas,
                     'status' => $item->status,
-                    'avatar' => $item->avatar == null ? null : asset('storage/' . $item->avatar),
+                    'avatar' => $item->avatar == null ?  url('storage/crew/avatar/default.jpg')  : asset('storage/' . $item->avatar),
                 ];
             });
 
@@ -179,7 +179,7 @@ class CrewController extends Controller
                     "end_date" => $item["end_date"],
                     "kontrak_lanjutan" => $item["kontrak_lanjutan"],
                     "status_kontrak" => $item["status_kontrak"],
-                    "file" => asset('storage/' . $item->file),
+                    "file" =>$item->avatar==null?  url('storage/crew/avatar/default.jpg') : asset('storage/' . $item->file),
                     "perusahaan" => $item["perusahaan"] == null ? null : $item["perusahaan"]["nama_perusahaan"],
                     "jabatan" => $item["jabatan"] == null ? null : $item["jabatan"]["nama_jabatan"],
                     "wilayah" => $item["wilayah"] == null ? null : $item["wilayah"]["nama_wilayah"],

@@ -44,6 +44,7 @@ class LookupResource extends Resource
                         //'signon' => 'signon',
                         //'mutasi/promosi' => 'mutasi/promosi',
                         'sign_off' => 'sign_off',
+                        'template_form' => 'template_form',
                     ])
                     ->required(),
                 Select::make('code')
@@ -59,6 +60,7 @@ class LookupResource extends Resource
                             //'signon' => ['dibuat_oleh' => 'dibuat_oleh', 'diperiksa_oleh' => 'diperiksa_oleh', 'diketahui_oleh_1' => 'diketahui_oleh_1', 'diketahui_oleh_2' => 'diketahui_oleh_2', 'disetujui_oleh_1' => 'disetujui_oleh_1', 'disetujui_oleh_2' => 'disetujui_oleh_2'],
                             //'mutasi/promosi' => ['dibuat_oleh' => 'dibuat_oleh', 'diketahui_oleh' => 'diketahui_oleh', 'disetujui_oleh' => 'disetujui_oleh'],
                             'sign_off' => ['crewing_manager' => 'crewing_manager', 'direktur' => 'direktur'],
+                            'template_form' => ['template_interview' => 'template_interview', 'template_sign_on' => 'template_sign_on', 'template_sign_off' => 'template_sign_off', 'template_mutasi_promosi', 'template_mutasi_promosi'],
                             default => [],
                         };
                     })
