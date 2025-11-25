@@ -17,6 +17,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -132,7 +133,7 @@ class PerusahaanResource extends Resource
                 //
             ])
             ->recordActions([
-                  Action::make('download')
+                Action::make('download')
                     ->size('sm')
                     ->button()
                     ->color('info')
