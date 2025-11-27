@@ -47,7 +47,7 @@ class DocumentPanelProvider extends PanelProvider
                     ->icon('heroicon-m-user-circle')
             ])
             ->colors([
-                'primary' => Color::Blue,
+                'primary' =>  Color::Blue,
             ])
             ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop()

@@ -172,7 +172,7 @@ class AllCrewForm
                                 ->schema([
                                     TextInput::make('email')->label('Email')->email()->required(),
                                     TextInput::make('no_hp')->label('No. HP')->numeric()->required(),
-                                    TextInput::make('no_telp_rumah')->label('No. Telp Rumah')->numeric()->nullable(),
+                                    TextInput::make('no_hp_rumah')->label('No. Telp Rumah')->numeric()->nullable(),
                                     Textarea::make('alamat_ktp')->label('Alamat KTP')->columnSpan(1),
                                     Textarea::make('alamat_sekarang')->label('Alamat Sekarang')->columnSpan(2),
                                 ]),

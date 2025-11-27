@@ -15,9 +15,13 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\Width;
+use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -97,8 +101,34 @@ class PerusahaanResource extends Resource
                     ->label('NPWP'),
                 TextEntry::make('alamat')
                     ->label('Alamat'),
-                TextEntry::make('keterangan')
-                    ->columnSpanFull(),
+                Section::make()
+                    ->columnSpanFull()
+                    ->schema([
+                        TextEntry::make('keterangan')
+                            ->columnSpanFull(),
+                    ]),
+                TextEntry::make('file')
+                    ->label('File Dokumen')
+                    ->icon('heroicon-o-document-text')
+                    ->badge()
+                    ->getStateUsing(
+                        function ($record) {
+                            return  $record->file ?? null;
+                        }
+                    )
+                    ->formatStateUsing(
+                        fn($state) =>
+                        $state ? 'Document File' : 'Tidak ada file'
+                    )
+                    ->color(
+                        fn($state) =>
+                        $state ? 'info' : 'danger'
+                    )
+                    ->url(
+                        fn($state) =>
+                        asset('storage/' . $state),
+                        shouldOpenInNewTab: true
+                    ),
 
             ]);
     }
@@ -162,13 +192,13 @@ class PerusahaanResource extends Resource
                         return $extension === 'pdf';
                     }),
 
-                ViewAction::make()->button(),
+                ViewAction::make()->button()->modalAlignment(Alignment::Center)->modalIcon('heroicon-o-building-office'),
                 EditAction::make()->button(),
-                DeleteAction::make()->button(),
+                DeleteAction::make()->button()
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
                 ]),
             ]);
     }

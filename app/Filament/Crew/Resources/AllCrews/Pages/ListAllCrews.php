@@ -44,6 +44,7 @@ class ListAllCrews extends ListRecords
                 ]),
 
             CreateAction::make()
+            ->color('primary')
                 ->icon('heroicon-o-pencil-square'),
         ];
     }

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Filament\Notifications\Notification;
+use Filament\Support\Exceptions\Halt;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -15,7 +17,7 @@ class WilayahOperasional extends Model
         'nama_wilayah',
         'kode_wilayah',
         'deskripsi',
-        
+
         'ttd_dibuat',
         'ttd_diperiksa',
         'ttd_diketahui_1',
@@ -37,5 +39,32 @@ class WilayahOperasional extends Model
     public function kapal()
     {
         return $this->hasMany(Kapal::class, 'id_wilayah');
+    }
+
+    public function kontrak()
+    {
+        return $this->hasMany(CrewKontrak::class, 'id_wilayah')->orderByDesc('created_at');
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            if ($model->kapal()->exists()) {
+                Notification::make()
+                    ->title('Gagal menghapus')
+                    ->body('Tidak bisa dihapus karena masih memiliki relasi Kapal.')
+                    ->danger()
+                    ->send();
+                throw new Halt();
+            }
+            if ($model->kontrak()->exists()) {
+                Notification::make()
+                    ->title('Gagal menghapus')
+                    ->body('Data tidak bisa dihapus karena memiliki relasi kontrak crew.')
+                    ->danger()
+                    ->send();
+                throw new Halt();
+            }
+        });
     }
 }

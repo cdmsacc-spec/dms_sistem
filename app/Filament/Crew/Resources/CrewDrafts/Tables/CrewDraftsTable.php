@@ -38,7 +38,7 @@ class CrewDraftsTable
                     ->searchable(),
                 TextColumn::make('status')
                     ->badge()
-                    ->color('warning')
+                    ->color('primary')
                     ->searchable(),
             ])
             ->filters([

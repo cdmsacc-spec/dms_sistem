@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Filament\Notifications\Notification;
+use Filament\Support\Exceptions\Halt;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -35,6 +37,11 @@ class Perusahaan extends Model
         return $this->hasMany(Kapal::class, 'id_perusahaan');
     }
 
+    public function kontrak()
+    {
+        return $this->hasMany(CrewKontrak::class, 'id_perusahaan')->orderByDesc('created_at');
+    }
+
     protected static function booted()
     {
 
@@ -51,6 +58,25 @@ class Perusahaan extends Model
         static::deleted(function ($model) {
             if ($model->file && \Storage::disk('public')->exists($model->file)) {
                 \Storage::disk('public')->delete($model->file);
+            }
+        });
+
+         static::deleting(function ($model) {
+            if ($model->kapal()->exists()) {
+                Notification::make()
+                    ->title('Gagal menghapus')
+                    ->body('Tidak bisa dihapus karena masih memiliki relasi kapal.')
+                    ->danger()
+                    ->send();
+                throw new Halt();
+            }
+            if ($model->kontrak()->exists()) {
+                Notification::make()
+                    ->title('Gagal menghapus')
+                    ->body('Tidak bisa dihapus karena masih memiliki relasi kontrak crew.')
+                    ->danger()
+                    ->send();
+                throw new Halt();
             }
         });
     }

@@ -18,8 +18,12 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Alignment;
+use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -107,7 +111,35 @@ class KapalResource extends Resource
                 TextEntry::make('status_certified'),
                 TextEntry::make('perusahaan.nama_perusahaan'),
                 TextEntry::make('wilayahOperasional.nama_wilayah'),
-                TextEntry::make('file'),
+                TextEntry::make('file')
+                    ->label('File Dokumen')
+                    ->icon('heroicon-o-document-text')
+                    ->badge()
+                    ->getStateUsing(
+                        function ($record) {
+                            return  $record->file ?? null;
+                        }
+                    )
+                    ->formatStateUsing(
+                        fn($state) =>
+                        $state ? 'Document File' : 'Tidak ada file'
+                    )
+                    ->color(
+                        fn($state) =>
+                        $state ? 'info' : 'danger'
+                    )
+                    ->url(
+                        fn($state) =>
+                        asset('storage/' . $state),
+                        shouldOpenInNewTab: true
+                    ),
+                Section::make()
+                    ->columnSpanFull()
+                    ->schema([
+                        TextEntry::make('keterangan')
+                            ->columnSpanFull(),
+                    ]),
+
             ]);
     }
 
@@ -171,14 +203,14 @@ class KapalResource extends Resource
                         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
                         return $extension === 'pdf';
                     }),
-                    
-                ViewAction::make()->button(),
+
+                ViewAction::make()->button()->modalAlignment(Alignment::Center)->modalIcon('heroicon-o-paper-airplane'),
                 EditAction::make()->button(),
-                DeleteAction::make()->button(),
+                DeleteAction::make()->button()
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
                 ]),
             ]);
     }
@@ -189,6 +221,4 @@ class KapalResource extends Resource
             'index' => ManageKapals::route('/'),
         ];
     }
-
-    
 }

@@ -37,7 +37,7 @@ class CrewMutasisTable
                     ->searchable(),
                 TextColumn::make('status')
                     ->badge()
-                    ->color('warning')
+                    ->color('success')
                     ->searchable(),
             ])
             ->recordActions([

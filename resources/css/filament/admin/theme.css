@@ -8,7 +8,7 @@
 }
 
 .fi-topbar {
-    @apply bg-blue-600;
+    background-color: #101090;
 }
 
 .fi-topbar-open-sidebar-btn{
@@ -28,7 +28,7 @@
 }
 
 .fi-global-search-field .fi-icon{
-    @apply text-blue-600;
+    color: #101090;
 }
 
 .fi-global-search-field .fi-input-wrp-content-ctn{
@@ -36,7 +36,7 @@
 }
 
 .dark .fi-global-search-field .fi-icon{
-    @apply text-blue-600;
+    color: #101090;
 }
 
 .dark .fi-global-search-field .fi-input-wrp-content-ctn{
@@ -50,9 +50,12 @@
 .dark .fi-sidebar {
     @apply bg-black;
 }
+.fi-sidebar-header{
+       background-color: #101090;
+}
 
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn{
-   @apply bg-blue-600;
+    background-color: #101090;
 }
 
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn span{
@@ -131,7 +134,7 @@
 }
 
 .fi-sc-section.section-filter-dashboard header{
-    @apply rounded-tr-xl rounded-tl-xl bg-blue-600;
+    @apply rounded-tr-xl rounded-tl-xl bg-blue-800;
 }
 
 .fi-sc-section.section-filter-dashboard h2{

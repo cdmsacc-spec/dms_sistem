@@ -13,9 +13,11 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -104,11 +106,29 @@ class WilayahOperasionalResource extends Resource
             ->recordActions([
                 ViewAction::make()->button(),
                 EditAction::make()->button(),
-                DeleteAction::make()->button(),
+                DeleteAction::make()->button()
+                    ->before(function ($record) {
+                        if ($record->kontrak()->exists()) {
+                            Notification::make()
+                                ->title('Gagal menghapus')
+                                ->body('Data tidak bisa dihapus karena memiliki relasi kontrak crew.')
+                                ->danger()
+                                ->send();
+                            throw new Halt();
+                        }
+                        if ($record->kapal()->exists()) {
+                            Notification::make()
+                                ->title('Gagal menghapus')
+                                ->body('Data tidak bisa dihapus karena memiliki relasi kapal.')
+                                ->danger()
+                                ->send();
+                            throw new Halt();
+                        }
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make() 
                 ]),
             ]);
     }

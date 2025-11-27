@@ -13,8 +13,10 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -77,11 +79,11 @@ class JenisKapalResource extends Resource
             ->recordActions([
                 ViewAction::make()->button(),
                 EditAction::make()->button(),
-                DeleteAction::make()->button(),
+                DeleteAction::make()->button()
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
                 ]),
             ]);
     }

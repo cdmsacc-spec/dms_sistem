@@ -22,6 +22,7 @@ class ManageLookups extends ManageRecords
                 ->modalIcon('heroicon-o-pencil-square')
                 ->modalHeading('Add Lookup')
                 ->modalWidth('xl')
+                ->modalAlignment(Alignment::Center)
                 ->icon('heroicon-o-pencil-square'),
         ];
     }

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Filament\Notifications\Notification;
+use Filament\Support\Exceptions\Halt;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -35,5 +37,19 @@ class Jabatan extends Model
     public function crew()
     {
         return $this->hasMany(CrewKontrak::class, 'id_jabatan');
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            if ($model->crew()->exists()) {
+                Notification::make()
+                    ->title('Gagal menghapus')
+                    ->body('Tidak bisa dihapus karena masih memiliki relasi kontrak crew.')
+                    ->danger()
+                    ->send();
+                throw new Halt();
+            }
+        });
     }
 }
