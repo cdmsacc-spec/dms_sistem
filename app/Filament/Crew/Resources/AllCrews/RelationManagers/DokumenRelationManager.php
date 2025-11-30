@@ -83,6 +83,12 @@ class DokumenRelationManager extends RelationManager
                     ->directory('crew/dokumen')
                     ->columnSpan(3)
                     ->required()
+                    ->downloadable()
+                    ->acceptedFileTypes([
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    ])
                     ->getUploadedFileNameForStorageUsing(function ($file, callable $get) {
                         try {
                             $nama_crew = optional($this->ownerRecord)->nama_crew ?? 'crew';

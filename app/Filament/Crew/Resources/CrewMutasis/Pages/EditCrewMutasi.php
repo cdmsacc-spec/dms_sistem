@@ -46,6 +46,7 @@ class EditCrewMutasi extends EditRecord
         DB::transaction(function () use ($item) {
             $lookup = Lookup::where('code', 'sign_on')->lockForUpdate()->first();
             if (
+                !empty($item['kategory']) &&
                 !empty($item['berangkat_dari']) &&
                 !empty($item['id_perusahaan']) &&
                 !empty($item['id_jabatan']) &&
@@ -60,7 +61,7 @@ class EditCrewMutasi extends EditRecord
 
 
                 $kontrak = $this->record->kontrak()->create([
-                    'kategory' => 'promosi',
+                    'kategory' => $item['kategory'],
                     'nomor_dokumen'   => $lookup->name ?? 1,
                     'id_perusahaan'    => $item['id_perusahaan'],
                     'berangkat_dari'   => $item['berangkat_dari'],

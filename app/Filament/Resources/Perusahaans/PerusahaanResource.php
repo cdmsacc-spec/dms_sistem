@@ -59,7 +59,6 @@ class PerusahaanResource extends Resource
                 TextInput::make('telp')
                     ->label('Telepon')
                     ->unique(ignorable: fn($record) => $record)
-                    ->numeric()
                     ->required(),
                 TextInput::make('npwp')
                     ->label('NPWP')
@@ -75,6 +74,7 @@ class PerusahaanResource extends Resource
                     ->label('Upload File')
                     ->disk('public')
                     ->directory('perusahaan')
+                    ->downloadable()
                     ->required()
                     ->columnSpanFull()
                     ->getUploadedFileNameForStorageUsing(function ($file, callable $get,) {

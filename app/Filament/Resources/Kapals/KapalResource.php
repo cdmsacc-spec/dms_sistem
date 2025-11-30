@@ -90,6 +90,7 @@ class KapalResource extends Resource
                     ->disk('public')
                     ->directory('kapal')
                     ->required()
+                    ->downloadable()
                     ->columnSpanFull()
                     ->getUploadedFileNameForStorageUsing(function ($file, callable $get,) {
                         $perusahaanId   = $get('id_perusahaan');

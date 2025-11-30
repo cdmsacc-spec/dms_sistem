@@ -2,6 +2,7 @@
 
 namespace App\Filament\Crew\Resources\CrewAppraisals\RelationManagers;
 
+use Filament\Actions\Action;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -10,6 +11,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -18,6 +20,8 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Hugomyb\FilamentMediaAction\Actions\MediaAction;
+use Illuminate\Support\Facades\Storage;
 
 class AppraisalRelationManager extends RelationManager
 {
@@ -42,6 +46,34 @@ class AppraisalRelationManager extends RelationManager
                     ])
                     ->columnSpanFull()
                     ->required(),
+                       FileUpload::make('file')
+                            ->label('File')
+                            ->disk('public')
+                            ->directory('crew/appraisal')
+                            ->columnSpanFull()
+                            ->required()
+                            ->downloadable()
+                            ->dehydrated(false)
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            ])
+                            ->getUploadedFileNameForStorageUsing(function ($file, callable $get, $record) {
+                                try {
+                                    $nama_crew = optional($this->ownerRecord)->crew->nama_crew ?? 'crew';
+                                    $appraiser     = $get('aprraiser') ?? 'aprraiser';
+                                    $now       = now()->format('YmdHis');
+                                    $filename = strtolower(
+                                        preg_replace('/[^A-Za-z0-9\-]/', '_', "appraisal-crew-{$nama_crew}-form-appraiser-{$appraiser}-{$now}")
+                                    ) . '.' . $file->getClientOriginalExtension();
+
+                                    return $filename;
+                                } catch (\Throwable $e) {
+                                    \Log::error("Error generate filename: " . $e->getMessage());
+                                    throw $e;
+                                }
+                            }),
                 Textarea::make('keterangan')
                     ->columnSpanFull()
             ]);
@@ -61,12 +93,7 @@ class AppraisalRelationManager extends RelationManager
                     ->sortable()
                     ->label('Tanggal'),
                 TextColumn::make('nilai')
-                    ->sortable()
-                    ->description(fn($state) => 'bobot nilai ' . $state)
-                    ->formatStateUsing(
-                        fn($state) =>
-                        $state == 100 ? 'Sangat Memuaskan' : ($state == 75 ? 'Memuaskan' : ($state == 50 ? 'Cukup Memuaskan' : ($state == 25 ? 'Tidak Memuaskan' : '-')))
-                    ),
+                    ->sortable(),
                 TextColumn::make('keterangan'),
             ])
             ->filters([
@@ -74,6 +101,34 @@ class AppraisalRelationManager extends RelationManager
             ])
             ->headerActions([])
             ->recordActions([
+                Action::make('download')
+                    ->size('sm')
+                    ->color('info')
+                    ->button()
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->url(fn($record) => asset('storage/' . $record->file), shouldOpenInNewTab: true)
+                    ->visible(function ($record) {
+                        $path = $record->file ?? null;
+                        if (! $path) return false;
+                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                        return $extension != 'pdf';
+                    }),
+
+                MediaAction::make('Preview')
+                    ->label('Preview')
+                    ->size('sm')
+                    ->color('info')
+                    ->button()
+                    ->modalWidth('full')
+                    ->icon('heroicon-o-eye')
+                    ->modalHeading(fn($record) => $record->jenis_dokumen)
+                    ->media(fn($record) => str_replace(' ', '%20', Storage::url($record->file)))
+                    ->visible(function ($record) {
+                        $path = $record->file ?? null;
+                        if (! $path) return false;
+                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                        return $extension === 'pdf';
+                    }),
                 EditAction::make()->button()
                     ->modalIcon('heroicon-o-printer')
                     ->modalHeading('Edit Appraisal')

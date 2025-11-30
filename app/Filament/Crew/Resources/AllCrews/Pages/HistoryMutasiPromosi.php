@@ -31,7 +31,10 @@ class HistoryMutasiPromosi extends ManageRelatedRecords
     protected static string $relationship = 'mutasi';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    public function getBreadcrumb(): string
+    {
+        return 'mutasi dan promosi ' . $this->record->nama_crew;
+    }
     public function form(Schema $schema): Schema
     {
         return $schema

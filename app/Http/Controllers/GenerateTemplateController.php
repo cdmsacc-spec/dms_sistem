@@ -52,6 +52,7 @@ class GenerateTemplateController extends Controller
 
     public function generateFormSignon(Request $request)
     {
+        $templates = $request->template_type;
         $kontrak = CrewKontrak::with([
             'wilayah:id,nama_wilayah,ttd_dibuat,ttd_diperiksa,ttd_diketahui_1,ttd_diketahui_2,ttd_disetujui_1,ttd_disetujui_2',
             'jabatan:id,nama_jabatan',
@@ -73,7 +74,8 @@ class GenerateTemplateController extends Controller
         ]);
 
         // Load template
-        $template = new TemplateProcessor(storage_path('app/public/templates/MUTASI SIGN ON.docx'));
+        $template = $templates == 2 ?  new TemplateProcessor(storage_path('app/public/templates/MUTASI SIGN ON - 2.docx'))
+            : new TemplateProcessor(storage_path('app/public/templates/MUTASI SIGN ON.docx'));
 
         // === HEADER SECTION ===
         $bulanAngka = (int) $kontrak->created_at->format('m');
@@ -92,7 +94,7 @@ class GenerateTemplateController extends Controller
             12 => 'XII',
         ][$bulanAngka];
         if (preg_match('/^\d+$/', $kontrak->nomor_dokumen)) {
-            $kontrak->nomor_dokumen = "{$kontrak->nomor_dokumen}/{$kontrak->perusahaan->kode_perusahaan}-CRW-MTS/{$bulanRomawi}/{$kontrak->created_at->format('Y')}";
+            $kontrak->nomor_dokumen = "{$kontrak->nomor_dokumen}/{$kontrak->perusahaan->kode_perusahaan}-CREW-SON/{$bulanRomawi}.{$kontrak->created_at->format('Y')}";
             $kontrak->save();
         }
 
@@ -108,20 +110,22 @@ class GenerateTemplateController extends Controller
         $template->setValue('nama', $kontrak->crew->nama_crew);
         $template->setValue('jabatan', $kontrak->jabatan->nama_jabatan);
         $template->setValue('gaji', $kontrak->gaji);
-        $template->setValue('status', 'Sign On / PKL');
+        $template->setValue('status', 'Sign On / Crew PKL');
         $template->setValue('berangkat_dari', $kontrak->berangkat_dari);
         $template->setValue('wilayah', $kontrak->wilayah->nama_wilayah);
         $template->setValue('kapal', $kontrak->kapal->nama_kapal);
         $template->setValue('start_date', Carbon::parse($kontrak->start_date)->format('d M Y'));
+        $template->setValue('dikeluarkan', Carbon::parse($kontrak->start_date)->copy()->subDay()->format('d M Y'));
 
         // === FOOTER SECTION ===
 
-        $template->setValue('dibuat',     $kontrak->wilayah->ttd_dibuat ?? '');
-        $template->setValue('diperiksa',  $kontrak->wilayah->ttd_diperiksa ?? '');
-        $template->setValue('diketahui1', $kontrak->wilayah->ttd_diketahui_1 ?? '');
-        $template->setValue('diketahui2', $kontrak->wilayah->ttd_diketahui_2 ?? '');
-        $template->setValue('disetujui1', $kontrak->wilayah->ttd_disetujui_1 ?? '');
-        $template->setValue('disetujui2', $kontrak->wilayah->ttd_disetujui_2 ?? '');
+        $template->setValue('dibuat',     $kontrak->wilayah->ttd_dibuat ?? '-');
+        $template->setValue('diperiksa',  $kontrak->wilayah->ttd_diperiksa ?? '-');
+        $template->setValue('diketahui1', $kontrak->wilayah->ttd_diketahui_1 ?? '-');
+        $template->setValue('diketahui2', $kontrak->wilayah->ttd_diketahui_2 ?? '-');
+        $template->setValue('disetujui1', $kontrak->wilayah->ttd_disetujui_1 ?? '-');
+        $template->setValue('disetujui2', $kontrak->wilayah->ttd_disetujui_2 ?? '-');
+        $template->setValue('presiden_direktur', $templates == 2 ? $kontrak->wilayah->ttd_disetujui_2 ?? '-' : $kontrak->wilayah->ttd_disetujui_1 ?? '-');
 
         // === EXPORT FILE ===
         $date = now();
@@ -166,7 +170,9 @@ class GenerateTemplateController extends Controller
         ][now()->month];
 
         if (preg_match('/^\d+$/', $last->nomor_dokumen)) {
-            $last->nomor_dokumen = "{$last->nomor_dokumen}/{$last->perusahaan->kode_perusahaan}-CRW-MTS/{$bulanRomawi}/{$last->created_at->format('Y')}";
+            $last->nomor_dokumen =  $last->kategory == 'mutasi' ?
+                "{$last->nomor_dokumen}/{$last->perusahaan->kode_perusahaan}-CREW-MTS/{$bulanRomawi}/{$last->created_at->format('Y')}"
+                : "{$last->nomor_dokumen}/{$last->perusahaan->kode_perusahaan}-CREW-PRM/{$bulanRomawi}/{$last->created_at->format('Y')}";
             $last->save();
         }
 
@@ -194,7 +200,7 @@ class GenerateTemplateController extends Controller
         ]);
 
         // ================= FOOTER =================
-   
+
         $template->setValue('dibuat_oleh',    $last->wilayah->ttd_dibuat ?? '');
         $template->setValue('diketahui_oleh', $last->wilayah->ttd_diketahui_1 ?? '');
         $template->setValue('disetujui_oleh', $last->wilayah->ttd_disetujui_1 ?? '');
@@ -203,7 +209,7 @@ class GenerateTemplateController extends Controller
         // === EXPORT FILE ===
         $date = now();
         $crewName = str_replace(' ', '_', strtolower($last->crew->nama_crew));
-        $fileName = "Mutasi_Promosi_Form_{$crewName}_{$date}.docx";
+        $fileName =  $last->kategory == 'mutasi' ? "Mutasi_Form_{$crewName}_{$date}.docx" : "Promosi_Form_{$crewName}_{$date}.docx";
 
         $tempFile = tempnam(sys_get_temp_dir(), 'word');
         $template->saveAs($tempFile);

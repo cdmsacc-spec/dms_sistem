@@ -2,6 +2,7 @@
 
 namespace App\Filament\Crew\Resources\AllCrews\Schemas;
 
+use App\Models\Jabatan;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -52,9 +53,14 @@ class AllCrewForm
                                         'xl' => 3
                                     ])
                                     ->schema([
-                                        TextInput::make('posisi_dilamar')
+                                      
+                                        Select::make('posisi_dilamar')
                                             ->label('Posisi Dilamar')
-                                            ->required(),
+                                            ->placeholder('')
+                                            ->searchable()
+                                            ->preload()
+                                            ->options(Jabatan::pluck('nama_jabatan', 'nama_jabatan'))
+                                            ->native(false),
 
                                         TextInput::make('nama_crew')
                                             ->label('Nama Lengkap')
@@ -171,8 +177,8 @@ class AllCrewForm
                             Grid::make(3)
                                 ->schema([
                                     TextInput::make('email')->label('Email')->email()->required(),
-                                    TextInput::make('no_hp')->label('No. HP')->numeric()->required(),
-                                    TextInput::make('no_hp_rumah')->label('No. Telp Rumah')->numeric()->nullable(),
+                                    TextInput::make('no_hp')->label('No. HP')->required(),
+                                    TextInput::make('no_hp_rumah')->label('No. Telp Rumah')->nullable(),
                                     Textarea::make('alamat_ktp')->label('Alamat KTP')->columnSpan(1),
                                     Textarea::make('alamat_sekarang')->label('Alamat Sekarang')->columnSpan(2),
                                 ]),
@@ -214,7 +220,30 @@ class AllCrewForm
                                 ])
                                 ->schema([
                                     TextInput::make('nama')->label('Nama'),
-                                    TextInput::make('hubungan')->label('Hubungan'),
+                                    Select::make('hubungan')->label('Hubungan')
+                                        ->native(false)
+                                        ->searchable()
+                                        ->placeholder('')
+                                        ->options([
+                                            'Ayah' => 'Ayah',
+                                            'Ibu' => 'Ibu',
+                                            'Suami' => 'Suami',
+                                            'Istri' => 'Istri',
+                                            'Anak' => 'Anak',
+                                            'Kakak' => 'Kakak',
+                                            'Adik' => 'Adik',
+                                            'Saudara' => 'Saudara',
+                                            'Saudari' => 'Saudari',
+                                            'Kakek' => 'Kakek',
+                                            'Nenek' => 'Nenek',
+                                            'Paman' => 'Paman',
+                                            'Bibi' => 'Bibi',
+                                            'Keponakan' => 'Keponakan',
+                                            'Sepupu' => 'Sepupu',
+                                            'Mertua' => 'Mertua',
+                                            'Menantu' => 'Menantu',
+                                            'Ipar' => 'Ipar',
+                                        ]),
                                     TextInput::make('no_hp')->label('No Telepon'),
                                     TextInput::make('alamat')->label('Alamat')->columnSpanFull(),
                                 ])

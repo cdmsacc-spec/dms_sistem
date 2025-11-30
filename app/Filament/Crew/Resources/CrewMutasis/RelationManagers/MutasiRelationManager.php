@@ -151,6 +151,18 @@ class MutasiRelationManager extends RelationManager
                                 }
                             }),
 
+                        Select::make('kategory')
+                            ->label('Kategory')
+                            ->disabled()
+                            ->native(false)
+                            ->options([
+                                'promosi' => 'promosi',
+                                'mutasi' => 'mutasi'
+                            ])
+                            ->reactive()
+                            ->placeholder('')
+                            ->dehydrated(false),
+
                         DatePicker::make('start_date')
                             ->label('Tanggal Mulai Kontrak')
                             ->prefixIcon('heroicon-m-calendar')
@@ -174,9 +186,15 @@ class MutasiRelationManager extends RelationManager
                             ->label('Upload File Mutasi/Promosi')
                             ->columnSpan(1)
                             ->disk('public')
+                            ->downloadable()
                             ->preserveFilenames()
                             ->directory('crew/mutasi')
                             ->columnSpanFull()
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            ])
                             ->required(),
                     ]),
             ]);
@@ -231,7 +249,7 @@ class MutasiRelationManager extends RelationManager
                     ->modalIcon('heroicon-o-printer')
                     ->modalDescription('generate dokumen untuk kontrak ini')
                     ->modalWidth(Width::Small)
-                    ->hidden(fn($record) => $record->kategory === 'signon' || $record->status_kontrak == 'active')
+                    ->hidden(fn($record) => $record->kategory === 'signon' || $record->status_kontrak == 'active' || $record->status_kontrak == 'expired')
                     ->before(fn($record,  $action) => redirect()->route('generate.promosi', [
                         'id' => $this->ownerRecord->id
                     ]))
@@ -239,7 +257,7 @@ class MutasiRelationManager extends RelationManager
                 EditAction::make()
                     ->button()
                     ->slideOver()
-                    ->hidden(fn($record) => $record->kategory === 'signon')
+                    ->hidden(fn($record) => $record->kategory === 'signon' || $record->status_kontrak == 'expired')
                     ->after(function ($record) {
                         if (!empty($record->file)) {
                             $record->crew()->update(['status' => 'active']);

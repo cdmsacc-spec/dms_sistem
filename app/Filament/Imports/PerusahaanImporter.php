@@ -22,6 +22,7 @@ class PerusahaanImporter extends Importer
             ImportColumn::make('telp')->requiredMapping(),
             ImportColumn::make('npwp')->requiredMapping(),
             ImportColumn::make('keterangan')->requiredMapping(),
+
         ];
     }
 

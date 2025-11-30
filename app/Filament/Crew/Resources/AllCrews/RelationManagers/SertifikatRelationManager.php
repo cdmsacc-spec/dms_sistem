@@ -68,6 +68,12 @@ class SertifikatRelationManager extends RelationManager
                     ->directory('crew/sertifikat')
                     ->columnSpan(3)
                     ->required()
+                    ->downloadable()
+                    ->acceptedFileTypes([
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    ])
                     ->getUploadedFileNameForStorageUsing(function ($file, callable $get) {
                         try {
                             $nama_crew = optional($this->ownerRecord)->nama_crew ?? 'crew';
@@ -123,7 +129,7 @@ class SertifikatRelationManager extends RelationManager
                         'expired' => 'danger',
                     }),
             ])
-        
+
             ->headerActions([
                 CreateAction::make()
                     ->label('Add Sertifikat')
@@ -134,7 +140,7 @@ class SertifikatRelationManager extends RelationManager
                     }),
             ])
             ->recordActions([
-                    Action::make('download')
+                Action::make('download')
                     ->size('sm')
                     ->color('info')
                     ->button()

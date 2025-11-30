@@ -37,7 +37,13 @@ class SignoffRelationManager extends RelationManager
                     ->label('File')
                     ->columnSpan(2)
                     ->disk('public')
+                    ->downloadable()
                     ->preserveFilenames()
+                    ->acceptedFileTypes([
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    ])
                     ->directory('crew/signoff'),
             ]);
     }

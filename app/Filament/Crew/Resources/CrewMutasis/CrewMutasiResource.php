@@ -24,7 +24,7 @@ class CrewMutasiResource extends Resource
     protected static ?string $model = Crew::class;
 
     protected static string|BackedEnum|null $navigationIcon = null;
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 6;
     protected static ?string $navigationLabel = "Mutasi promosi";
     protected static ?string $pluralModelLabel = "Mutasi promosi";
     protected static string | UnitEnum | null $navigationGroup = 'Crew Management';

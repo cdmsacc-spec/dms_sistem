@@ -151,6 +151,17 @@ class CrewMutasiForm
                                     $set('end_date', null);
                                 }
                             }),
+                            
+                        Select::make('kategory')
+                            ->label('Kategory')
+                            ->native(false)
+                            ->options([
+                                'promosi' => 'promosi',
+                                'mutasi' => 'mutasi'
+                            ])
+                            ->reactive()
+                            ->placeholder('')
+                            ->dehydrated(false),
 
                         DatePicker::make('start_date')
                             ->label('Tanggal Mulai Kontrak')

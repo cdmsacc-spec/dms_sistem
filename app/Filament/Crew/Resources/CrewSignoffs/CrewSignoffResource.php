@@ -23,7 +23,7 @@ class CrewSignoffResource extends Resource
 
        protected static string|BackedEnum|null $navigationIcon = null;
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 7;
     protected static ?string $navigationLabel = "Sign off";
     protected static ?string $pluralModelLabel = "Sign off";
     protected static string | UnitEnum | null $navigationGroup = 'Crew Management';

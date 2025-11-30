@@ -112,5 +112,11 @@ class CrewKontrak extends Model
                 \Storage::disk('public')->delete($model->file);
             }
         });
+
+        static::deleting(function ($model) {
+            foreach ($model->appraisal as $data) {
+                $data->delete();
+            }
+        });
     }
 }

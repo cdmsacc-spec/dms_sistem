@@ -14,6 +14,7 @@ class CrewAppraisal extends Model
         'id_kontrak',
         'nilai',
         'aprraiser',
+        'file',
         'keterangan',
     ];
 
@@ -25,6 +26,7 @@ class CrewAppraisal extends Model
                 'nilai',
                 'aprraiser',
                 'keterangan',
+                'file'
             ])
             ->logOnlyDirty()
             ->useLogName('Appraisal')
@@ -35,5 +37,24 @@ class CrewAppraisal extends Model
     public function kontrak()
     {
         return $this->belongsTo(CrewKontrak::class, 'id_kontrak');
+    }
+
+     protected static function booted()
+    {
+        static::updating(function ($model) {
+            if ($model->isDirty('file')) {
+                $oldFile = $model->getOriginal('file');
+
+                if ($oldFile && \Storage::disk('public')->exists($oldFile)) {
+                    \Storage::disk('public')->delete($oldFile);
+                }
+            }
+        });
+
+        static::deleted(function ($model) {
+            if ($model->file && \Storage::disk('public')->exists($model->file)) {
+                \Storage::disk('public')->delete($model->file);
+            }
+        });
     }
 }

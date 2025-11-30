@@ -45,13 +45,16 @@ class CrewAppraisalsTable
                     ->searchable(),
                 TextColumn::make('appraisal_avg_nilai')
                     ->badge()
-                    ->description(fn($state) => match (true) {
-                        $state >= 100 => 'Sangat memuaskan ',
-                        $state >= 75  => 'Memuaskan',
-                        $state >= 50  => 'Cukup memuaskan',
-                        $state >= 25  => 'Tidak memuaskan',
-                        default => 'gray',
-                    })
+                    ->description(
+                        fn($state) => match (true) {
+                            $state < 45            => "Sangat Buruk",
+                            $state >= 45 && $state <= 59 => "Buruk",
+                            $state >= 60 && $state <= 75 => "Rata-rata",
+                            $state >= 76 && $state <= 90 => "Baik",
+                            $state >= 91 && $state <= 100 => "Sangat Baik",
+                            default => "Belum Dinilai",
+                        }
+                    )
                     ->formatStateUsing(
                         fn($state) => $state ? number_format($state, 0) : '-'
                     )

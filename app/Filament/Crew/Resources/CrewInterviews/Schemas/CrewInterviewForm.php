@@ -80,6 +80,7 @@ class CrewInterviewForm
                             ->preserveFilenames()
                             ->maxSize(10240)
                             ->disk('public')
+                            ->downloadable()
                             ->dehydrated(false)
                             ->directory('crew/interview')
                             ->acceptedFileTypes([

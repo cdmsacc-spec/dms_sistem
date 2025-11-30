@@ -25,7 +25,7 @@ class CrewAppraisalResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = null;
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 5;
     protected static ?string $navigationLabel = "Appraisal";
     protected static ?string $pluralModelLabel = "Appraisal";
     protected static string | UnitEnum | null $navigationGroup = 'Crew Management';

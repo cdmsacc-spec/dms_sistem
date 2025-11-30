@@ -163,12 +163,18 @@ class SigonRelationManager extends RelationManager
                             ->required(),
 
                         FileUpload::make('file')
-                            ->label('Upload File Sign On')
+                            ->label('Upload File Signed on')
                             ->columnSpan(1)
                             ->disk('public')
+                            ->downloadable()
                             ->preserveFilenames()
                             ->directory('crew/signon')
                             ->columnSpanFull()
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            ])
                             ->required(),
                     ]),
             ]);
@@ -222,16 +228,28 @@ class SigonRelationManager extends RelationManager
                     ->requiresConfirmation()
                     ->modalIcon('heroicon-o-printer')
                     ->modalDescription('generate dokumen untuk kontrak ini')
+                    ->schema([
+                        Select::make('template_type')
+                            ->native(false)
+                            ->required()
+                            ->placeholder('')
+                            ->options([
+                                1 => "template 1",
+                                2 => "template 2",
+                            ])
+                    ])
                     ->modalWidth(Width::Small)
-                    ->hidden(fn($record) => $record->kategory === 'promosi' || $record->status_kontrak == 'active')
-                    ->before(fn($record,  $action) => redirect()->route('generate.signon', [
+                    ->hidden(fn($record) => $record->kategory === 'promosi' || $record->file != null)
+                    ->before(fn(array $data, $record,  $action) => redirect()->route('generate.signon', [
                         'id' => $record->id,
+                        'template_type' => $data['template_type']
                     ]))
                     ->after(fn($record, $action) => $action->cancel()),
                 EditAction::make()
                     ->button()
                     ->slideOver()
-                    ->hidden(fn($record) => $record->kategory === 'promosi')
+
+                    ->hidden(fn($record) => $record->kategory === 'promosi' ||$record->status_kontrak !='active' && $record->status_kontrak != 'waiting approval')
                     ->after(function ($record) {
                         if (!empty($record->file)) {
                             $record->crew()->update(['status' => 'active']);

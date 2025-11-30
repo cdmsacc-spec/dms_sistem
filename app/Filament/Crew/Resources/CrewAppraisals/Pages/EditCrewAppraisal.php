@@ -8,6 +8,9 @@ use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class EditCrewAppraisal extends EditRecord
 {
@@ -34,19 +37,46 @@ class EditCrewAppraisal extends EditRecord
 
     protected function afterSave()
     {
+        DB::beginTransaction();
+        $path = null;
         try {
             $item = $this->form->getRawState();
             if (
                 !empty($item['aprraiser']) &&
                 !empty($item['nilai']) &&
-                !empty($item['keterangan'])
+                !empty($item['keterangan']) &&
+                !empty($item['file_appraisal'])
             ) {
+
+                $file = is_array($item['file_appraisal']) ? reset($item['file_appraisal']) : $item['file_appraisal'];
+
+                if (is_string($file)) {
+                    $path = $file;
+                } else {
+                    // Baru simpan file upload
+                    $path = $file->storeAs(
+                        'crew/appraisal',
+                        $file->getClientOriginalName(),
+                        'public'
+                    );
+                }
+
                 $this->record->appraisal()->create([
                     'id_kontrak' => $item['id'],
                     'aprraiser' => $item['aprraiser'],
                     'nilai' => $item['nilai'],
                     'keterangan' => $item['keterangan'],
+                    'file' => $path,
+
                 ]);
+                DB::commit();
+
+                Notification::make()
+                    ->title('Success')
+                    ->body('The crew appraisal results have been successfully saved')
+                    ->success()
+                    ->send();
+                $this->form->fill();
                 $this->dispatch('refresh');
             } else {
                 Notification::make()
@@ -56,6 +86,11 @@ class EditCrewAppraisal extends EditRecord
                     ->send();
             }
         } catch (\Throwable $th) {
+            DB::rollBack();
+
+            if ($path && Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
             Notification::make()
                 ->title('Failed')
                 ->danger()

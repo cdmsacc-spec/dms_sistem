@@ -111,7 +111,7 @@ class Crew extends Model
 
     public function mutasi()
     {
-        return $this->hasMany(CrewKontrak::class, 'id_crew')->where('kategory', 'promosi')->orderByDesc('created_at');
+        return $this->hasMany(CrewKontrak::class, 'id_crew')->whereIn('kategory', ['promosi', 'mutasi'])->orderByDesc('created_at');
     }
 
     public function signoff()

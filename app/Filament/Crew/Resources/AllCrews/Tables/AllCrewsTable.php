@@ -11,6 +11,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
@@ -140,6 +141,34 @@ class AllCrewsTable
                 ->color('info')
                 ->label('Terapkan Filter'),)
             ->recordActions([
+                Action::make('change_status')
+                    ->label('Change To Standby')
+                    ->button()
+                    ->icon('heroicon-o-link')
+                    ->color('warning')
+                    ->hidden(fn($record) => $record->status != 'inactive')
+                    ->action(function ($record) {
+                        $record->update(['status' => 'standby']);
+                        Notification::make()
+                            ->title('Success')
+                            ->body('Status proses has been updated to standby.')
+                            ->success()
+                            ->send();
+                    }),
+                Action::make('change_status')
+                    ->label('Change To Draft')
+                    ->button()
+                    ->icon('heroicon-o-link')
+                    ->color('warning')
+                    ->hidden(fn($record) => $record->status != 'rejected')
+                    ->action(function ($record) {
+                        $record->update(['status' => 'draft']);
+                        Notification::make()
+                            ->title('Success')
+                            ->body('Status proses has been updated to draft.')
+                            ->success()
+                            ->send();
+                    }),
                 ViewAction::make()->button(),
                 EditAction::make()->button(),
                 DeleteAction::make()->button()

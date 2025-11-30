@@ -24,7 +24,7 @@ class DetailKontrak extends Page
             $this->crewPkl =  CrewKontrak::findOrFail($this->record);
         }
     }
-   
+
     public function infolist(Schema $infolist): Schema
     {
         return $infolist
@@ -130,10 +130,11 @@ class DetailKontrak extends Page
                                 }
                                 $average = round($appraisals->avg());
                                 return match (true) {
-                                    $average >= 100 => "Sangat Memuaskan ($average)",
-                                    $average >= 75  => "Memuaskan ($average)",
-                                    $average >= 50  => "Cukup Memuaskan ($average)",
-                                    $average >= 25  => "Tidak Memuaskan ($average)",
+                                    $average < 45            => "Sangat Buruk ($average)",
+                                    $average >= 45 && $average <= 59 => "Buruk ($average)",
+                                    $average >= 60 && $average <= 75 => "Rata-rata ($average)",
+                                    $average >= 76 && $average <= 90 => "Baik ($average)",
+                                    $average >= 91 && $average <= 100 => "Sangat Baik ($average)",
                                     default => "Belum Dinilai",
                                 };
                             }),
