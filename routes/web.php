@@ -23,9 +23,9 @@ Route::get('generate/promosi', [GenerateTemplateController::class, 'generateForm
 
 Route::get('send', function () {
 
-    Mail::raw('Ini hanya uji coba kirim email dari Laravel.', function ($message) {
-        $message->to('ryanxxjr@gmail.com')
-            ->subject('Test Email Laravel');
+    Mail::raw('Ini hanya uji coba.', function ($message) {
+        $message->to('yudi.nurhadi@haritashipping.com')
+            ->subject('Test Email Reminder');
     });
 
     return 'Email sudah dikirim!';

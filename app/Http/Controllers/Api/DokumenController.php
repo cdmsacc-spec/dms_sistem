@@ -89,7 +89,6 @@ class DokumenController extends Controller
         }
     }
 
-
     public function detail(Request $request)
     {
         try {
@@ -156,6 +155,7 @@ class DokumenController extends Controller
                 'status'            => $data->status,
                 'tempat_penerbitan' => $data->tempat_penerbitan,
                 'created_at'        => $data->created_at,
+                'author' => $data->author,
                 'tanggal_terbit'   => $data->latestHistory->tanggal_terbit ?? null,
                 'tanggal_expired'   => $data->latestHistory->tanggal_expired ?? null,
                 'nomor_dokumen'     => $data->latestHistory->nomor_dokumen ?? null,
@@ -171,7 +171,6 @@ class DokumenController extends Controller
             return new ArrayResource(false, $th, null);
         }
     }
-
 
     public function dashboard(Request $request)
     {

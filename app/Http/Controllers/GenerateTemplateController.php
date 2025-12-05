@@ -9,6 +9,7 @@ use App\Models\CrewSignOff;
 use App\Models\Lookup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use PhpOffice\PhpWord\TemplateProcessor;
 
 class GenerateTemplateController extends Controller
@@ -184,6 +185,7 @@ class GenerateTemplateController extends Controller
             'telepon_perusahaan'  => $last->perusahaan->telp,
             'bulan'               => $bulanRomawi,
             'tahun'               => now()->format('Y'),
+            'kategory'            => Str::upper($last->kategory),
         ]);
         // ================= BODY =================
         $template->setValues([
