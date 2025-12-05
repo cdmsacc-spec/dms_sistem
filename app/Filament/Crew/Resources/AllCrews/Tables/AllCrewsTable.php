@@ -112,18 +112,23 @@ class AllCrewsTable
                             })
 
                     ])->query(function ($query, $data) {
-                        $query->whereHas('kontrak', function ($q) use ($data) {
-                            $q->where('status_kontrak', 'active')
-                                ->whereHas('jabatan', function ($q2) use ($data) {
-                                    $q2->where('golongan', $data['golongan']);
-                                    if (!empty($data['golongan'])) {
+
+                        if (!empty($data['golongan'])) {
+                            $query->whereHas('kontrak', function ($q) use ($data) {
+                                $q->where('status_kontrak', 'active')
+                                    ->whereHas('jabatan', function ($q2) use ($data) {
                                         $q2->where('golongan', $data['golongan']);
-                                    }
-                                    if (!empty($data['jabatans'])) {
+                                    });
+                            });
+                        }
+                        if (!empty($data['jabatans'])) {
+                            $query->whereHas('kontrak', function ($q) use ($data) {
+                                $q->where('status_kontrak', 'active')
+                                    ->whereHas('jabatan', function ($q2) use ($data) {
                                         $q2->where('nama_jabatan', $data['jabatans']);
-                                    }
-                                });
-                        });
+                                    });
+                            });
+                        }
                     })
                     ->indicateUsing(function (array $data): ?string {
                         $texts = [];

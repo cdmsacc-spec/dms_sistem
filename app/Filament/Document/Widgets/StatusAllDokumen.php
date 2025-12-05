@@ -46,9 +46,6 @@ class StatusAllDokumen extends ChartWidget
         $uptodate = $results['uptodate'] ?? 0;
         $expired = $results['expired'] ?? 0;
         $near_expiry = $results['near expiry'] ?? 0;
-
-
-
         return [
             'datasets' => [
 
