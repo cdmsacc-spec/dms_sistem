@@ -43,33 +43,36 @@ class StatusAllDokumen extends ChartWidget
             ->whereIn('status', ['uptodate', 'expired', 'near expiry'])
             ->groupBy('status')
             ->pluck('total', 'status');
-
         $uptodate = $results['uptodate'] ?? 0;
         $expired = $results['expired'] ?? 0;
         $near_expiry = $results['near expiry'] ?? 0;
 
+
+
         return [
             'datasets' => [
+
                 [
                     'label' => 'Expired',
                     'borderWidth' => 0,
                     'data' => [$expired],
-                    'backgroundColor' => '#EF4444',
+                    'backgroundColor' => ['#EF4444'],
                 ],
                 [
                     'label' => 'Near Expiry',
                     'borderWidth' => 0,
                     'data' => [$near_expiry],
-                    'backgroundColor' => '#FACC15',
+                    'backgroundColor' =>  '#FACC15',
                 ],
                 [
                     'label' => 'UpToDate',
                     'borderWidth' => 0,
                     'data' => [$uptodate],
                     'backgroundColor' => '#22C55E',
-                ],
+                ]
+
             ],
-            'labels' => ['Expired', 'Near Expiry', 'UpToDate'],
+            'labels' => [''],
         ];
     }
 

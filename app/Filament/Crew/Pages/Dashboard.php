@@ -38,7 +38,7 @@ class Dashboard extends PagesDashboard
 
     public function getHeaderWidgetsColumns(): int|array
     {
-        return ["sm"=>1,"md"=>1,"lg"=>1,"xl"=>2];
+        return ["sm" => 1, "md" => 1, "lg" => 1, "xl" => 2];
     }
     public function getHeaderWidgets(): array
     {
@@ -81,6 +81,7 @@ class Dashboard extends PagesDashboard
                     TextInput::make('periode')
                         ->label('Periode')
                         ->type('month')
+                        ->default(null)
                         ->placeholder('Tanggal')
                         ->columnSpan(1),
                 ])

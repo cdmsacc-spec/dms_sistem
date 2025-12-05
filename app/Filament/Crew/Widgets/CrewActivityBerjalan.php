@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log as FacadesLog;
 class CrewActivityBerjalan extends ChartWidget
 {
     protected ?string $heading = 'Crew Activity Berjalan';
-    
+
     use HasWidgetShield, InteractsWithPageFilters;
 
     public function getColumnSpan(): array|int|string
@@ -30,15 +30,42 @@ class CrewActivityBerjalan extends ChartWidget
     protected static bool $isLazy = true;
     protected function getData(): array
     {
-        $periode  = $this->filters['periode']  ?? Carbon::now();
+        $periode  = $this->filters['periode']  ?? null;
         $carbonDate = $periode instanceof \Carbon\Carbon ? $periode : \Carbon\Carbon::parse($periode);
+
+        $crewPromosiPerMonth = CrewKontrak::select(
+            DB::raw("EXTRACT(MONTH FROM start_date) as bulan"),
+            DB::raw("COUNT(*) as total")
+        )
+            ->when($periode, function ($query, $periode) {
+                $carbonDate = $periode instanceof \Carbon\Carbon
+                    ? $periode
+                    : \Carbon\Carbon::parse($periode);
+
+                return $query
+                    ->whereMonth('created_at', $carbonDate->month)
+                    ->whereYear('created_at', $carbonDate->year);
+            })
+            ->where('kategory', 'promosi')
+            ->groupBy('bulan')
+            ->orderBy('bulan')
+            ->pluck('total', 'bulan')
+            ->toArray();
 
         $crewMutasiPerMonth = CrewKontrak::select(
             DB::raw("EXTRACT(MONTH FROM start_date) as bulan"),
             DB::raw("COUNT(*) as total")
         )
-            ->whereYear('start_date', $carbonDate->year)
-            ->where('kategory', 'promosi')
+            ->when($periode, function ($query, $periode) {
+                $carbonDate = $periode instanceof \Carbon\Carbon
+                    ? $periode
+                    : \Carbon\Carbon::parse($periode);
+
+                return $query
+                    ->whereMonth('created_at', $carbonDate->month)
+                    ->whereYear('created_at', $carbonDate->year);
+            })
+            ->where('kategory', 'mutasi')
             ->groupBy('bulan')
             ->orderBy('bulan')
             ->pluck('total', 'bulan')
@@ -48,7 +75,15 @@ class CrewActivityBerjalan extends ChartWidget
             DB::raw("EXTRACT(MONTH FROM start_date) as bulan"),
             DB::raw("COUNT(*) as total")
         )
-            ->whereYear('start_date', $carbonDate->year)
+            ->when($periode, function ($query, $periode) {
+                $carbonDate = $periode instanceof \Carbon\Carbon
+                    ? $periode
+                    : \Carbon\Carbon::parse($periode);
+
+                return $query
+                    ->whereMonth('created_at', $carbonDate->month)
+                    ->whereYear('created_at', $carbonDate->year);
+            })
             ->where('kategory', 'signon')
             ->groupBy('bulan')
             ->orderBy('bulan')
@@ -59,7 +94,15 @@ class CrewActivityBerjalan extends ChartWidget
             DB::raw("EXTRACT(MONTH FROM tanggal) as bulan"),
             DB::raw("COUNT(*) as total")
         )
-            ->whereYear('tanggal', $carbonDate->year)
+            ->when($periode, function ($query, $periode) {
+                $carbonDate = $periode instanceof \Carbon\Carbon
+                    ? $periode
+                    : \Carbon\Carbon::parse($periode);
+
+                return $query
+                    ->whereMonth('created_at', $carbonDate->month)
+                    ->whereYear('created_at', $carbonDate->year);
+            })
             ->groupBy('bulan')
             ->orderBy('bulan')
             ->pluck('total', 'bulan')
@@ -71,13 +114,16 @@ class CrewActivityBerjalan extends ChartWidget
         foreach (range(1, 12) as $bulan) {
             $seriesMutasi[] = $crewMutasiPerMonth[$bulan] ?? 0;
         }
-
+        $seriesPromosi = [];
+        foreach (range(1, 12) as $bulan) {
+            $seriesPromosi[] = $crewPromosiPerMonth[$bulan] ?? 0;
+        }
         $seriesDataSignon = [];
         foreach (range(1, 12) as $bulan) {
             $seriesDataSignon[] = $crewSignonPerMonth[$bulan] ?? 0;
         }
 
-          $seriesDataSignoff = [];
+        $seriesDataSignoff = [];
         foreach (range(1, 12) as $bulan) {
             $seriesDataSignoff[] = $crewSignoffPerMonth[$bulan] ?? 0;
         }
@@ -87,9 +133,15 @@ class CrewActivityBerjalan extends ChartWidget
             'labels' => $labels,
             'datasets' => [
                 [
-                    'label' => 'Mutasi/Promosi',
+                    'label' => 'Mutasi',
                     'data' => $seriesMutasi,
                     'backgroundColor' => '#3bc4ff',
+                    'borderWidth' => 0,
+                ],
+                [
+                    'label' => 'Promosi',
+                    'data' => $seriesPromosi,
+                    'backgroundColor' => '#1016C7',
                     'borderWidth' => 0,
                 ],
                 [
@@ -98,7 +150,7 @@ class CrewActivityBerjalan extends ChartWidget
                     'backgroundColor' => '#1CED23',
                     'borderWidth' => 0,
                 ],
-                 [
+                [
                     'label' => 'Sign off',
                     'data' => $seriesDataSignoff,
                     'backgroundColor' => '#fc0303',

@@ -5,6 +5,7 @@ namespace App\Filament\Crew\Widgets;
 use App\Models\Crew;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Support\Carbon;
 
 class CrewUsiaGroup extends ChartWidget
@@ -12,7 +13,7 @@ class CrewUsiaGroup extends ChartWidget
     protected ?string $heading = 'Crew Usia Group';
     protected static bool $isLazy = true;
 
-    use HasWidgetShield;
+    use HasWidgetShield,InteractsWithPageFilters;
     public function getColumnSpan(): array|int|string
     {
         return [
@@ -25,8 +26,7 @@ class CrewUsiaGroup extends ChartWidget
 
     protected function getData(): array
     {
-        $periode  = $this->filters['periode']  ?? Carbon::now();
-        $carbonDate = $periode instanceof \Carbon\Carbon ? $periode : \Carbon\Carbon::parse($periode);
+        $periode  = $this->filters['periode']  ?? null;
 
         $usiaGroups = Crew::selectRaw("
             CASE 
@@ -38,8 +38,15 @@ class CrewUsiaGroup extends ChartWidget
             END as kategori_usia,
             COUNT(*) as total
         ")
-            ->whereMonth('created_at',  $carbonDate->month)
-            ->whereYear('created_at', $carbonDate->year)
+            ->when($periode, function ($query, $periode) {
+                $carbonDate = $periode instanceof \Carbon\Carbon
+                    ? $periode
+                    : \Carbon\Carbon::parse($periode);
+
+                return $query
+                    ->whereMonth('created_at', $carbonDate->month)
+                    ->whereYear('created_at', $carbonDate->year);
+            })
             ->groupBy('kategori_usia')
             ->pluck('total', 'kategori_usia')
             ->toArray();

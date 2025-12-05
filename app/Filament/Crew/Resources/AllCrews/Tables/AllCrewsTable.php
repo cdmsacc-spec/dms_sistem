@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ImageColumn;
@@ -72,24 +73,73 @@ class AllCrewsTable
                         ]
                     ),
 
-                SelectFilter::make('jabatan')
-                    ->label('Jabatan')
-                    ->native(false)
-                    ->searchable()
-                    ->preload()
-                    ->options(function () {
-                        return Jabatan::pluck('golongan', 'id')->toArray();
-                    })
-                    ->query(function ($query, $data) {
-                        if (empty($data['value'])) return;
 
+                Filter::make('jabatan')
+                    ->columnSpan(2)
+                    ->columns(2)
+                    ->schema([
+                        Select::make('golongan')
+                            ->label('Golongan')
+                            ->placeholder('')
+                            ->native(false)
+                            ->searchable()
+                            ->preload()
+                            ->reactive()
+                            ->options(function () {
+                                return Jabatan::pluck('golongan', 'golongan')->toArray();
+                            })
+                            ->afterStateUpdated(function ($get, $set, $state) {
+
+                                if (empty($state)) {
+                                    $set('jabatans', null);
+                                }
+                            }),
+
+                        Select::make('jabatans')
+                            ->label('Jabatan')
+                            ->placeholder('')
+                            ->native(false)
+                            ->searchable()
+                            ->preload()
+                            ->options(function (callable $get) {
+                                $golongan = $get('golongan');
+                                if ($golongan) {
+                                    return Jabatan::where('golongan', $golongan)
+                                        ->pluck('nama_jabatan', 'nama_jabatan')
+                                        ->toArray();
+                                }
+                                return [];
+                            })
+
+                    ])->query(function ($query, $data) {
                         $query->whereHas('kontrak', function ($q) use ($data) {
                             $q->where('status_kontrak', 'active')
                                 ->whereHas('jabatan', function ($q2) use ($data) {
-                                    $q2->where('id', $data['value']);
+                                    $q2->where('golongan', $data['golongan']);
+                                    if (!empty($data['golongan'])) {
+                                        $q2->where('golongan', $data['golongan']);
+                                    }
+                                    if (!empty($data['jabatans'])) {
+                                        $q2->where('nama_jabatan', $data['jabatans']);
+                                    }
                                 });
                         });
+                    })
+                    ->indicateUsing(function (array $data): ?string {
+                        $texts = [];
+
+                        if (!empty($data['golongan'])) {
+                            $texts[] = "Golongan: " . $data['golongan'];
+                        }
+
+                        if (!empty($data['jabatans'])) {
+
+                            $texts[] = "Jabatan: " . $data['jabatans'];
+                        }
+
+                        return $texts ? implode(', ', $texts) : null;
                     }),
+
 
                 SelectFilter::make('perusahaaan')
                     ->label('Perusahaan')
@@ -141,7 +191,7 @@ class AllCrewsTable
                 ->color('info')
                 ->label('Terapkan Filter'),)
             ->recordActions([
-                Action::make('change_status')
+                Action::make('change_status_standby')
                     ->label('Change To Standby')
                     ->button()
                     ->icon('heroicon-o-link')
@@ -155,7 +205,7 @@ class AllCrewsTable
                             ->success()
                             ->send();
                     }),
-                Action::make('change_status')
+                Action::make('change_status_draft')
                     ->label('Change To Draft')
                     ->button()
                     ->icon('heroicon-o-link')

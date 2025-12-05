@@ -190,7 +190,7 @@ class GenerateTemplateController extends Controller
         // ================= BODY =================
         $template->setValues([
             'nama_crew'               => $last->crew->nama_crew,
-            'jabatan_old'             => $second->jabatan->devisi . ' / ' . $second->jabatan->golongan . '-' . $second->jabatan->nama_jabatan,
+            'jabatan_old'             => $second->jabatan->devisi . ' / ' . $second->jabatan->golongan . ' / ' . $second->jabatan->nama_jabatan,
             'start_date_old'          => Carbon::parse($second->start_date)->format('d M Y'),
             'jabatan_new'             => $last->jabatan->devisi . ' / ' . $last->jabatan->golongan . '-' . $last->jabatan->nama_jabatan,
             'wilayah_operasional'     => $last->wilayah->nama_wilayah,

@@ -19,16 +19,19 @@ class CrewJabatanGroup extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $periode  = $this->filters['periode']  ?? Carbon::now();
-        $carbonDate = $periode instanceof Carbon ? $periode : Carbon::parse($periode);
+        $periode  = $this->filters['periode']  ?? null;
 
         $query = CrewKontrak::query();
         $items = $query->where('status_kontrak', 'active')
             ->whereHas('jabatan', function ($q) {
                 $q->whereIn('golongan', ['perwira', 'non-perwira']);
             })
-            ->when($carbonDate, function ($query, $carbonDate) {
-                return $query->whereMonth('created_at', $carbonDate->month)
+            ->when($periode, function ($query, $periode) {
+                $carbonDate = $periode instanceof Carbon
+                    ? $periode
+                    : Carbon::parse($periode);
+                return $query
+                    ->whereMonth('created_at', $carbonDate->month)
                     ->whereYear('created_at', $carbonDate->year);
             })
             ->with('jabatan')
@@ -56,7 +59,7 @@ class CrewJabatanGroup extends StatsOverviewWidget
                 ->url(auth()->user()?->can('view-any:crew') == true ? AllCrewResource::getUrl() . '?' . http_build_query([
                     'filters' => [
                         'jabatan' => [
-                            'value' => 'perwira'
+                            'golongan' => 'perwira'
                         ],
                     ],
                 ]) : false),
@@ -66,7 +69,7 @@ class CrewJabatanGroup extends StatsOverviewWidget
                 ->url(auth()->user()?->can('view-any:crew') == true ? AllCrewResource::getUrl() . '?' . http_build_query([
                     'filters' => [
                         'jabatan' => [
-                            'value' => 'non-perwira'
+                            'golongan' => 'non-perwira'
                         ],
                     ],
                 ]) : false),
