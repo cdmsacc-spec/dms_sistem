@@ -40,8 +40,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, Commenter
     {
         return match ($panel->getId()) {
             'admin' => $this->hasAnyRole(['super_admin', 'admin']),
-            'crew'  => $this->hasAnyRole(['staff_crew', 'manager_crew']),
-            'document'  => $this->hasAnyRole(['staff_dokumen', 'manager_dokumen', 'operation_dokumen']),
+            'crew'  => $this->hasAnyRole(['staff_crew', 'manager_crew', 'super_admin']),
+            'document'  => $this->hasAnyRole(['staff_dokumen', 'manager_dokumen', 'operation_dokumen','super_admin']),
             default => false,
         };
     }

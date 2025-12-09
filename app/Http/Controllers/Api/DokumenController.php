@@ -69,7 +69,7 @@ class DokumenController extends Controller
                             );
                         },
                     ]
-                )->paginate(10);
+                )->latest()->paginate(10);
 
             $data->getCollection()->transform(function ($item) {
                 return [

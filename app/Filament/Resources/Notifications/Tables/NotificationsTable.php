@@ -35,7 +35,16 @@ class NotificationsTable
             ->recordActions([
                 Action::make('view')->color('success')->icon('heroicon-o-eye')->button()
                     ->visible(fn($record) => $record->data['actions'] == null ? false : true)
-                    ->url(fn($record) => $record->data['actions'] == null ? null : url($record->data['actions'][0]['url'])),
+                    ->url(function ($record) {
+
+                        if ($record->data['actions'] == null) {
+                            return null;
+                        }
+                        $url = $record->data['actions'][0]['url'];
+                        $url = str_replace('/document', '/admin', $url);
+                        $url = str_replace('/crew', '/admin', $url);
+                        return url($url);
+                    }),
                 DeleteAction::make()->button()
             ])
             ->toolbarActions([

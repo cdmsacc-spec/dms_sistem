@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ArrayResource;
+use App\Http\Resources\ListResource;
 use App\Models\Jabatan;
 use App\Models\JenisDokumen;
 use App\Models\Kapal;
+use App\Models\Notification;
 use App\Models\Perusahaan;
 use App\Models\User;
 use App\Models\WilayahOperasional;
@@ -83,7 +85,6 @@ class AuthController extends Controller
         }
     }
 
-
     public function autologin(Request $request)
     {
         try {
@@ -122,6 +123,33 @@ class AuthController extends Controller
             return new ArrayResource(true, 'Login berhasil', $response);
         } catch (\Throwable $th) {
             return new ArrayResource(false, $th, null);
+        }
+    }
+
+    public function showNotification(Request $request)
+    {
+        try {
+            $token = $request->bearerToken();
+
+            $user = User::where('auth_token', $token)->first();
+            if (!$user) {
+                return new ArrayResource(false, 'token anda tidak valid, silahkan melakukan login ulang', null);
+            }
+
+            $data = Notification::where('notifiable_id', $user->id)->latest()->paginate(10);
+            $data->getCollection()->transform(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'title' => $item->data['title'] ?? null,
+                    'body' => $item->data['body'] ?? null,
+                    'url' => $item->data['actions'][0]['url'] ?? null,
+                    'created_at' => $item->created_at,
+
+                ];
+            });
+            return new ListResource(true, 'list notification', $data);
+        } catch (\Throwable $th) {
+            return new ArrayResource(false, $th->getMessage(), null);
         }
     }
 }

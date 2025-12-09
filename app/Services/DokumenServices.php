@@ -161,7 +161,6 @@ class DokumenServices
             }
         });
 
-
         ToReminderDokumen::where('id_dokumen', $data->id)->chunk(100, function ($reminderChungs) use ($pesan, $status, $title, $today, $data) {
             foreach ($reminderChungs as $reminders) {
                 if ($reminders->type == 'email') {

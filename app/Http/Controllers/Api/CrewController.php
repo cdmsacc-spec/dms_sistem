@@ -46,7 +46,7 @@ class CrewController extends Controller
                     $status,
                     fn($q) =>
                     $q->where('status', $status)
-                )->paginate(10);
+                )->latest()->paginate(10);
 
             $data->getCollection()->transform(function ($item) {
                 return [
@@ -179,7 +179,7 @@ class CrewController extends Controller
                     "end_date" => $item["end_date"],
                     "kontrak_lanjutan" => $item["kontrak_lanjutan"],
                     "status_kontrak" => $item["status_kontrak"],
-                    "file" =>$item->avatar==null?  url('storage/crew/avatar/default.jpg') : asset('storage/' . $item->file),
+                    "file" => $item->avatar == null ?  url('storage/crew/avatar/default.jpg') : asset('storage/' . $item->file),
                     "perusahaan" => $item["perusahaan"] == null ? null : $item["perusahaan"]["nama_perusahaan"],
                     "jabatan" => $item["jabatan"] == null ? null : $item["jabatan"]["nama_jabatan"],
                     "wilayah" => $item["wilayah"] == null ? null : $item["wilayah"]["nama_wilayah"],
