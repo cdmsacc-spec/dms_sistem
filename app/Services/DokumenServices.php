@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendFcmNotificationJob;
 use App\Mail\MailServices;
 use App\Models\Dokumen;
 use App\Models\ToReminderDokumen;
@@ -144,8 +145,24 @@ class DokumenServices
             ])
             ->sendToDatabase($recipient);
 
+            
+        $recipient->chunk(100)->each(function ($usersChunk) use ($pesan, $status, $title, $data) {
+            foreach ($usersChunk as $user) {
+                if (!$user->fcm_token) continue;
+                SendFcmNotificationJob::dispatch(
+                    $user->fcm_token,
+                    $title,
+                    $pesan,
+                    [
+                        'route' => '/doc/dashboard/dokumen/detail',
+                        'id'    =>(string) $data->id
+                    ]
+                );
+            }
+        });
+
+
         ToReminderDokumen::where('id_dokumen', $data->id)->chunk(100, function ($reminderChungs) use ($pesan, $status, $title, $today, $data) {
-            Log::info($reminderChungs);
             foreach ($reminderChungs as $reminders) {
                 if ($reminders->type == 'email') {
                     Mail::to($reminders->send_to)

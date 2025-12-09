@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendFcmNotificationJob;
 use App\Mail\MailServices;
 use App\Models\CrewKontrak;
 use App\Models\ReminderCrew;
@@ -79,11 +80,11 @@ class CrewKontrakServices
                 } else {
                     $reminderDate->startOfDay();
                 }
-               // Log::info('reminder:');
-               // Log::info($reminderDate->format('Y-m-d H:i'));
-               // Log::info('today:');
-               // Log::info($today->format('Y-m-d H:i'));
-                
+                // Log::info('reminder:');
+                // Log::info($reminderDate->format('Y-m-d H:i'));
+                // Log::info('today:');
+                // Log::info($today->format('Y-m-d H:i'));
+
                 if ($today->format('Y-m-d H:i') === $reminderDate->format('Y-m-d H:i')) {
                     $this->sendNotification($data, null,  $today);
                 }
@@ -128,13 +129,28 @@ class CrewKontrakServices
             ->title($title)
             ->body($pesan)
             ->success()
-          
+
             ->actions([
                 Action::make('view')
                     ->button()
                     ->url(url("/crew/all-crews/{$data->id}/detail_kontak")),
             ])
             ->sendToDatabase($recipient);
+
+        $recipient->chunk(100)->each(function ($usersChunk) use ($pesan, $status, $title, $data) {
+            foreach ($usersChunk as $user) {
+                if (!$user->fcm_token) continue;
+                SendFcmNotificationJob::dispatch(
+                    $user->fcm_token,
+                    $title,
+                    $pesan,
+                    [
+                        'route' => '/crew/dashboard/kontrak/detail',
+                        'id'    => (string)$data->id
+                    ]
+                );
+            }
+        });
 
         ToReminderCrew::chunk(100, function ($reminderChungs) use ($pesan, $status, $title, $today, $data) {
             foreach ($reminderChungs as $reminders) {

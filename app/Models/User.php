@@ -32,7 +32,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, Commenter
         'email',
         'password',
         'avatar',
-        'auth_token'
+        'auth_token',
+        'fcm_token'
     ];
 
     public function canAccessPanel(Panel $panel): bool

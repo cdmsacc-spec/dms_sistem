@@ -40,6 +40,7 @@ class AuthController extends Controller
 
             $email = $request->email;
             $password = $request->password;
+            $fcmToken = $request->fcm_token;
 
             $data = User::with('roles')->where('email', $email)->first();
             if ($data == null) {
@@ -50,6 +51,7 @@ class AuthController extends Controller
             }
 
             $data->auth_token =  Str::random(60);
+            $data->fcm_token = $fcmToken ?? null;
             $data->save();
 
             $perusahaan = Perusahaan::select('id', 'nama_perusahaan')->get();
@@ -67,6 +69,7 @@ class AuthController extends Controller
                 "avatar" => $data["avatar"] == null ?  url('storage/crew/avatar/default.jpg') : url('storage/' .  $data["avatar"]) ?? null,
                 "auth_token" => $data["auth_token"],
                 "roles" => $data["roles"]->pluck('name'),
+                "fcm_token" => $data["fcm_token"],
 
                 "perusahaan" => $perusahaan,
                 "jenis_dokumen" => $jenis_dokumen,
@@ -108,6 +111,7 @@ class AuthController extends Controller
                 "avatar" => $data["avatar"] == null ?  url('storage/crew/avatar/default.jpg') : url('storage/' .  $data["avatar"]) ?? null,
                 "auth_token" => $data["auth_token"],
                 "roles" => $data["roles"]->pluck('name'),
+                "fcm_token" => $data["fcm_token"],
 
                 "perusahaan" => $perusahaan,
                 "jenis_dokumen" => $jenis_dokumen,

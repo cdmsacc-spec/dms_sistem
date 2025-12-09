@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Services;
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Illuminate\Support\Facades\Http;
+
+class FcmTokenService
+{
+    public static function getAccessToken()
+    {
+        $jsonPath = config('services.fcm.service_account_path');
+        $client = json_decode(file_get_contents($jsonPath), true);
+
+        $now = time();
+
+        $payload = [
+            'iss' => $client['client_email'],
+            'scope' => 'https://www.googleapis.com/auth/firebase.messaging',
+            'aud' => $client['token_uri'],
+            'iat' => $now,
+            'exp' => $now + 3600,
+        ];
+
+        $jwt = JWT::encode($payload, $client['private_key'], 'RS256');
+
+        $response = Http::asForm()->post($client['token_uri'], [
+            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'assertion' => $jwt,
+        ]);
+
+        return $response->json()['access_token'];
+    }
+}

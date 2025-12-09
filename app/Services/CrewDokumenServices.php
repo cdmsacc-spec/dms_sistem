@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendFcmNotificationJob;
 use App\Mail\MailServices;
 use App\Models\CrewDokumen;
 use App\Models\ReminderCrew;
@@ -133,6 +134,21 @@ class CrewDokumenServices
                     ->url(url("/crew/all-crews/{$data->crew->id}")),
             ])
             ->sendToDatabase($recipient);
+
+        $recipient->chunk(100)->each(function ($usersChunk) use ($pesan, $status, $title, $data) {
+            foreach ($usersChunk as $user) {
+                if (!$user->fcm_token) continue;
+                SendFcmNotificationJob::dispatch(
+                    $user->fcm_token,
+                    $title,
+                    $pesan,
+                    [
+                        'route' => '/crew/dashboard/crews/detail',
+                        'id'    => (string)$data->crew->id
+                    ]
+                );
+            }
+        });
 
         ToReminderCrew::chunk(100, function ($reminderChungs) use ($pesan, $status, $title, $today, $data) {
             foreach ($reminderChungs as $reminders) {

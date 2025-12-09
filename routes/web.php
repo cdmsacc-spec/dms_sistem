@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FcmController;
 use App\Http\Controllers\GenerateTemplateController;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -30,3 +31,7 @@ Route::get('send', function () {
 
     return 'Email sudah dikirim!';
 });
+
+
+
+

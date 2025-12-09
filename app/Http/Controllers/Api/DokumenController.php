@@ -64,7 +64,8 @@ class DokumenController extends Controller
                                 'history_dokumens.id',
                                 'history_dokumens.id_dokumen',
                                 'history_dokumens.nomor_dokumen',
-                                'history_dokumens.tanggal_expired'
+                                'history_dokumens.tanggal_expired',
+                                'history_dokumens.tanggal_terbit'
                             );
                         },
                     ]
@@ -80,6 +81,7 @@ class DokumenController extends Controller
                     'tempat_penerbitan' => $item->tempat_penerbitan,
                     'created_at'        => $item->created_at,
                     'tanggal_expired'   => $item->latestHistory->tanggal_expired ?? null,
+                    'tanggal_terbit'   => $item->latestHistory->tanggal_terbit ?? null,
                     'nomor_dokumen'     => $item->latestHistory->nomor_dokumen ?? null,
                 ];
             });

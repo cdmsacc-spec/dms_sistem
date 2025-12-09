@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CrewController;
 use App\Http\Controllers\Api\DokumenController;
+use App\Http\Controllers\FcmController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,3 +29,5 @@ Route::prefix('/crew')->controller(CrewController::class)->group(function () {
     Route::post('/history_kontrak', 'crewHistoryKontrak');
     Route::post('/history_sign_off', 'crewHistorySignOff');
 });
+
+
