@@ -160,6 +160,7 @@ class CrewDokumenServices
                             url: url("/crew/all-crews/{$data->crew->id}"),
                             ceks: $pesan,
                             status: $status,
+                            subj: 'Informasi Dokumen Crew',
                             datetime: $today->format('d M Y'),
                         ));
                 }

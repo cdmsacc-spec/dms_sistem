@@ -160,6 +160,7 @@ class CrewSertifikatServices
                             url: url("/crew/all-crews/{$data->crew->id}?relation=1"),
                             ceks: $pesan,
                             status: $status,
+                            subj: 'Informasi Sertifikat Crew',
                             datetime: $today->format('d M Y'),
                         ));
                 }

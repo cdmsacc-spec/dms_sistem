@@ -118,19 +118,20 @@ class DokumenServices
 
         $title = 'Informasi Dokumen Pelayaran';
         $pesan = null;
+        $subj = "Reminder Dokumen {$data->kapal->nama_kapal} - {$data->jenisDokumen->nama_jenis}";
 
         switch ($status) {
             case $uptodate:
-                $pesan = "status dokumen nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} telah diperbarui dengan status sekarang {$status}";
+                $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} telah diperbarui dengan status sekarang {$status}";
                 break;
             case $nearExpiry:
-                $pesan = "status dokumen nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} akan segera berakhir pada {$data->historyDokumen->first()->tanggal_expired}. Mohon diperiksa dan diperbarui jika diperlukan.";
+                $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} akan segera berakhir pada {$data->historyDokumen->first()->tanggal_expired}. Mohon diperiksa dan diperbarui jika diperlukan.";
                 break;
             case $expired:
-                $pesan = "status dokumen nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} telah kadaluarsa pada {$data->historyDokumen->first()->tanggal_expired}. Segera lakukan tindakan untuk memperbarui dokumen.";
+                $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} telah kadaluarsa pada {$data->historyDokumen->first()->tanggal_expired}. Segera lakukan tindakan untuk memperbarui dokumen.";
                 break;
             default:
-                $pesan = "status dokumen nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} saat ini sudah hampir berakhir 30 hari sebelum expired. Segera lakukan pengecekan dan permbaruan jika diperlukan";
+                $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} saat ini sudah hampir berakhir 30 hari sebelum expired. Segera lakukan pengecekan dan permbaruan jika diperlukan";
                 break;
         }
 
@@ -162,7 +163,7 @@ class DokumenServices
             }
         });
 
-        ToReminderDokumen::where('id_dokumen', $data->id)->chunk(100, function ($reminderChungs) use ($pesan, $status, $title, $today, $data) {
+        ToReminderDokumen::where('id_dokumen', $data->id)->chunk(100, function ($reminderChungs) use ($pesan, $status, $title, $today, $data, $subj) {
             foreach ($reminderChungs as $reminders) {
                 if ($reminders->type == 'email') {
                     Mail::to($reminders->send_to)
@@ -171,6 +172,7 @@ class DokumenServices
                             url: url("/document/dokumens/$data->id"),
                             ceks: $pesan,
                             status: $status,
+                            subj : $subj,
                             datetime: $today->format('d M Y'),
                         ));
                 }

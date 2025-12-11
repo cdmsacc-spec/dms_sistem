@@ -162,6 +162,7 @@ class CrewKontrakServices
                             url: url("/crew/all-crews/{$data->id}/detail_kontak"),
                             ceks: $pesan,
                             status: $status,
+                            subj: 'Informasi Kontrak Crew',
                             datetime: $today->format('d M Y'),
                         ));
                 }

@@ -17,13 +17,16 @@ class MailServices extends Mailable
     public $url;
     public $ceks;
     public $status;
+
+    public $subj;
     public $datetime;
-    public function __construct($nama, $url, $ceks,  $status, $datetime)
+    public function __construct($nama, $url, $ceks,  $status, $subj, $datetime)
     {
         $this->nama = $nama;
         $this->url = $url;
         $this->ceks = $ceks;
         $this->status = $status;
+        $this->subj = $subj;
         $this->datetime = $datetime;
     }
 
@@ -33,7 +36,7 @@ class MailServices extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reminder Status DMS',
+            subject: $this->subj?? 'Reminder Status DMS',
         );
     }
 
