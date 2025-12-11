@@ -111,13 +111,13 @@ class CrewSertifikatServices
 
         switch ($status) {
             case $uptodate:
-                $pesan = "status data sertifikat crew {$data->crew->nama_crew}, dengan nomor sertifikat {$data->nomor_sertifikat}, nama sertifikat {$data->nama_sertifikat} telah diperbarui";
+                $pesan = "status data sertifikat crew {$data->crew->nama_crew}, dengan nomor sertifikat {$data->nomor_sertifikat}, nama sertifikat {$data->nama_sertifikat} telah diperbarui"; 
                 break;
             case $nearExpiry:
-                $pesan = "status data sertifikat crew {$data->crew->nama_crew}, dengan nomor sertifikat {$data->nomor_sertifikat}, nama sertifikat {$data->nama_sertifikat} akan segera berakhir pada {$data->tanggal_expired}. Mohon diperiksa dan diperbarui jika diperlukan.";
+                $pesan = "status data sertifikat crew {$data->crew->nama_crew}, dengan nomor sertifikat {$data->nomor_sertifikat}, nama sertifikat {$data->nama_sertifikat} akan segera berakhir pada ".Carbon::parse($data->tanggal_expired)->format('d-M-Y'). ". Mohon diperiksa dan diperbarui jika diperlukan.";
                 break;
             case $expired:
-                $pesan = "status data sertifikat crew {$data->crew->nama_crew}, dengan nomor sertifikat {$data->nomor_sertifikat}, nama sertifikat {$data->nama_sertifikat} telah kadaluarsa pada {$data->tanggal_expired}. Segera lakukan tindakan untuk memperbarui sertifikat.";
+                $pesan = "status data sertifikat crew {$data->crew->nama_crew}, dengan nomor sertifikat {$data->nomor_sertifikat}, nama sertifikat {$data->nama_sertifikat} telah kadaluarsa pada ".Carbon::parse($data->tanggal_expired)->format('d-M-Y'). ". Segera lakukan tindakan untuk memperbarui sertifikat.";
                 break;
             default:
                 $pesan = "status data sertifikat crew {$data->crew->nama_crew}, dengan nomor sertifikat {$data->nomor_sertifikat}, nama sertifikat {$data->nama_sertifikat} saat ini sudah hampir berakhir 30 hari sebelum expired. Segera lakukan pengecekan dan permbaruan jika diperlukan";

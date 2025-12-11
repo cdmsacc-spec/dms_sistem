@@ -125,10 +125,10 @@ class DokumenServices
                 $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} telah diperbarui dengan status sekarang {$status}";
                 break;
             case $nearExpiry:
-                $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} akan segera berakhir pada {$data->historyDokumen->first()->tanggal_expired}. Mohon diperiksa dan diperbarui jika diperlukan.";
+                $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} akan segera berakhir pada ".Carbon::parse($data->historyDokumen->first()->tanggal_expired)->format('d-M-Y'). ". Mohon diperiksa dan diperbarui jika diperlukan.";
                 break;
             case $expired:
-                $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} telah kadaluarsa pada {$data->historyDokumen->first()->tanggal_expired}. Segera lakukan tindakan untuk memperbarui dokumen.";
+                $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} telah kadaluarsa pada ".Carbon::parse($data->historyDokumen->first()->tanggal_expired)->format('d-M-Y'). ". Segera lakukan tindakan untuk memperbarui dokumen.";
                 break;
             default:
                 $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} saat ini sudah hampir berakhir 30 hari sebelum expired. Segera lakukan pengecekan dan permbaruan jika diperlukan";
@@ -147,7 +147,7 @@ class DokumenServices
             ])
             ->sendToDatabase($recipient);
 
-            
+
         $recipient->chunk(100)->each(function ($usersChunk) use ($pesan, $status, $title, $data) {
             foreach ($usersChunk as $user) {
                 if (!$user->fcm_token) continue;
@@ -157,7 +157,7 @@ class DokumenServices
                     $pesan,
                     [
                         'route' => '/doc/dashboard/dokumen/detail',
-                        'id'    =>(string) $data->id
+                        'id'    => (string) $data->id
                     ]
                 );
             }
@@ -172,7 +172,7 @@ class DokumenServices
                             url: url("/document/dokumens/$data->id"),
                             ceks: $pesan,
                             status: $status,
-                            subj : $subj,
+                            subj: $subj,
                             datetime: $today->format('d M Y'),
                         ));
                 }

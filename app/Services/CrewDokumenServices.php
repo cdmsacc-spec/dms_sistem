@@ -114,10 +114,10 @@ class CrewDokumenServices
                 $pesan = "status data dokumen crew {$data->crew->nama_crew}, dengan nomor dokumen {$data->nomor_dokumen}, jenis dokumen {$data->jenis_dokumen} telah diperbarui";
                 break;
             case $nearExpiry:
-                $pesan = "status data dokumen crew {$data->crew->nama_crew}, dengan nomor dokumen {$data->nomor_dokumen}, jenis dokumen {$data->jenis_dokumen} akan segera berakhir pada {$data->tanggal_expired}. Mohon diperiksa dan diperbarui jika diperlukan.";
+                $pesan = "status data dokumen crew {$data->crew->nama_crew}, dengan nomor dokumen {$data->nomor_dokumen}, jenis dokumen {$data->jenis_dokumen} akan segera berakhir pada ".Carbon::parse($data->tanggal_expired)->format('d-M-Y'). ". Mohon diperiksa dan diperbarui jika diperlukan.";
                 break;
             case $expired:
-                $pesan = "status data dokumen crew {$data->crew->nama_crew}, dengan nomor dokumen {$data->nomor_dokumen}, jenis dokumen {$data->jenis_dokumen} telah kadaluarsa pada {$data->tanggal_expired}. Segera lakukan tindakan untuk memperbarui dokumen.";
+                $pesan = "status data dokumen crew {$data->crew->nama_crew}, dengan nomor dokumen {$data->nomor_dokumen}, jenis dokumen {$data->jenis_dokumen} telah kadaluarsa pada ".Carbon::parse($data->tanggal_expired)->format('d-M-Y'). ". Segera lakukan tindakan untuk memperbarui dokumen.";
                 break;
             default:
                 $pesan = "status data dokumen crew {$data->crew->nama_crew}, dengan nomor dokumen {$data->nomor_dokumen}, jenis dokumen {$data->jenis_dokumen} saat ini sudah hampir berakhir 30 hari sebelum expired. Segera lakukan pengecekan dan permbaruan jika diperlukan";
