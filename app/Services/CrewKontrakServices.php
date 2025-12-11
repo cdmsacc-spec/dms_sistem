@@ -109,16 +109,18 @@ class CrewKontrakServices
 
         $title = 'Informasi Kontrak Crew';
         $pesan = null;
+        $expireds = Carbon::parse($data->end_date)
+            ->format('d-M-Y');
 
         switch ($status) {
             case $uptodate:
                 $pesan = "status kontrak crew {$data->crew->nama_crew}, dengan nomor kontrak {$data->nomor_dokumen}, perusahaan {$data->perusahaan->nama_perusahaan}, kapal {$data->kapal->nama_kapal} telah diperbarui";
                 break;
             case $nearExpiry:
-                $pesan = "status kontrak crew {$data->crew->nama_crew}, dengan nomor kontrak {$data->nomor_dokumen}, perusahaan {$data->perusahaan->nama_perusahaan}, kapal {$data->kapal->nama_kapal} akan segera berakhir pada ".Carbon::parse($data->end_date)->format('d-M-Y'). ". Mohon diperiksa dan diperbarui jika diperlukan.";
+                $pesan = "status kontrak crew {$data->crew->nama_crew}, dengan nomor kontrak {$data->nomor_dokumen}, perusahaan {$data->perusahaan->nama_perusahaan}, kapal {$data->kapal->nama_kapal} akan segera berakhir pada {$expireds}. Mohon diperiksa dan diperbarui jika diperlukan.";
                 break;
             case $expired:
-                $pesan = "status kontrak crew {$data->crew->nama_crew}, dengan nomor kontrak {$data->nomor_dokumen}, perusahaan {$data->perusahaan->nama_perusahaan}, kapal {$data->kapal->nama_kapal} telah kadaluarsa pada ".Carbon::parse($data->end_date)->format('d-M-Y'). ". Segera lakukan tindakan untuk memperbarui kontrak dokumen.";
+                $pesan = "status kontrak crew {$data->crew->nama_crew}, dengan nomor kontrak {$data->nomor_dokumen}, perusahaan {$data->perusahaan->nama_perusahaan}, kapal {$data->kapal->nama_kapal} telah kadaluarsa pada {$expireds}. Segera lakukan tindakan untuk memperbarui kontrak dokumen.";
                 break;
             default:
                 $pesan = "status kontrak crew {$data->crew->nama_crew}, dengan nomor kontrak {$data->nomor_dokumen}, perusahaan {$data->perusahaan->nama_perusahaan}, kapal {$data->kapal->nama_kapal} saat ini sudah hampir berakhir 30 hari sebelum expired. Segera lakukan pengecekan dan permbaruan jika diperlukan";

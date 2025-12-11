@@ -120,15 +120,18 @@ class DokumenServices
         $pesan = null;
         $subj = "Reminder Dokumen {$data->kapal->nama_kapal} - {$data->jenisDokumen->nama_jenis}";
 
+        $expireds = Carbon::parse($data->historyDokumen->first()->tanggal_expired)
+            ->format('d-M-Y');
+
         switch ($status) {
             case $uptodate:
                 $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} telah diperbarui dengan status sekarang {$status}";
                 break;
             case $nearExpiry:
-                $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} akan segera berakhir pada ".Carbon::parse($data->historyDokumen->first()->tanggal_expired)->format('d-M-Y'). ". Mohon diperiksa dan diperbarui jika diperlukan.";
+$pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} akan segera berakhir pada {$expireds}. Mohon diperiksa dan diperbarui jika diperlukan.";
                 break;
             case $expired:
-                $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} telah kadaluarsa pada ".Carbon::parse($data->historyDokumen->first()->tanggal_expired)->format('d-M-Y'). ". Segera lakukan tindakan untuk memperbarui dokumen.";
+                $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} telah kadaluarsa pada {$expireds}. Segera lakukan tindakan untuk memperbarui dokumen.";
                 break;
             default:
                 $pesan = "status dokumen {$data->jenisDokumen->nama_jenis} nomor {$data->historyDokumen->first()->nomor_dokumen}, kapal {$data->kapal->nama_kapal} saat ini sudah hampir berakhir 30 hari sebelum expired. Segera lakukan pengecekan dan permbaruan jika diperlukan";
