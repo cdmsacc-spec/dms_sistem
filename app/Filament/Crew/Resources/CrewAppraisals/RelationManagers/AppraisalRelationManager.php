@@ -21,6 +21,7 @@ use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Hugomyb\FilamentMediaAction\Actions\MediaAction;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 class AppraisalRelationManager extends RelationManager
@@ -46,34 +47,34 @@ class AppraisalRelationManager extends RelationManager
                     ])
                     ->columnSpanFull()
                     ->required(),
-                       FileUpload::make('file')
-                            ->label('File')
-                            ->disk('public')
-                            ->directory('crew/appraisal')
-                            ->columnSpanFull()
-                            ->required()
-                            ->downloadable()
-                            ->dehydrated(false)
-                            ->acceptedFileTypes([
-                                'application/pdf',
-                                'application/msword',
-                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            ])
-                            ->getUploadedFileNameForStorageUsing(function ($file, callable $get, $record) {
-                                try {
-                                    $nama_crew = optional($this->ownerRecord)->crew->nama_crew ?? 'crew';
-                                    $appraiser     = $get('aprraiser') ?? 'aprraiser';
-                                    $now       = now()->format('YmdHis');
-                                    $filename = strtolower(
-                                        preg_replace('/[^A-Za-z0-9\-]/', '_', "appraisal-crew-{$nama_crew}-form-appraiser-{$appraiser}-{$now}")
-                                    ) . '.' . $file->getClientOriginalExtension();
+                FileUpload::make('file')
+                    ->label('File')
+                    ->disk('public')
+                    ->directory('crew/appraisal')
+                    ->columnSpanFull()
+                    ->required()
+                    ->downloadable()
+                    ->dehydrated(false)
+                    ->acceptedFileTypes([
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    ])
+                    ->getUploadedFileNameForStorageUsing(function ($file, callable $get, $record) {
+                        try {
+                            $nama_crew = optional($this->ownerRecord)->crew->nama_crew ?? 'crew';
+                            $appraiser     = $get('aprraiser') ?? 'aprraiser';
+                            $now       = now()->format('YmdHis');
+                            $filename = strtolower(
+                                preg_replace('/[^A-Za-z0-9\-]/', '_', "appraisal-crew-{$nama_crew}-form-appraiser-{$appraiser}-{$now}")
+                            ) . '.' . $file->getClientOriginalExtension();
 
-                                    return $filename;
-                                } catch (\Throwable $e) {
-                                    \Log::error("Error generate filename: " . $e->getMessage());
-                                    throw $e;
-                                }
-                            }),
+                            return $filename;
+                        } catch (\Throwable $e) {
+                            \Log::error("Error generate filename: " . $e->getMessage());
+                            throw $e;
+                        }
+                    }),
                 Textarea::make('keterangan')
                     ->columnSpanFull()
             ]);
@@ -90,6 +91,7 @@ class AppraisalRelationManager extends RelationManager
                     ->rowIndex(),
                 TextColumn::make('aprraiser'),
                 TextColumn::make('created_at')
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('d-M-Y'))
                     ->sortable()
                     ->label('Tanggal'),
                 TextColumn::make('nilai')

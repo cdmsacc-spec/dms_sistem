@@ -2,6 +2,7 @@
 
 namespace App\Filament\Document\Resources\Notifications\Tables;
 
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -36,7 +37,16 @@ class NotificationsTable
             ->recordActions([
                 Action::make('view')->color('success')->icon('heroicon-o-eye')->button()
                     ->visible(fn($record) => $record->data['actions'] == null ? false : true)
-                    ->url(fn($record) => $record->data['actions'] == null ? null : url($record->data['actions'][0]['url'])),
+                    ->action(function ($record, $livewire) {
+                        $record->update([
+                            'read_at' => now()->format('Y-m-d H:i:s'), // atau Carbon::now()
+                        ]);
+
+                        $url = $record->data['actions'][0]['url'] ?? null;
+                        if ($url) {
+                            $livewire->redirect($url);
+                        }
+                    }),
                 DeleteAction::make()->button()
             ])
             ->toolbarActions([

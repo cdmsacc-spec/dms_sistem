@@ -64,6 +64,7 @@ class SignoffRelationManager extends RelationManager
                 TextColumn::make('nomor_dokumen')
                     ->searchable(),
                 TextColumn::make('tanggal')
+                    ->date('d-M-Y')
                     ->searchable(),
                 TextColumn::make('alasanBerhenti.nama_alasan')
                     ->searchable(),

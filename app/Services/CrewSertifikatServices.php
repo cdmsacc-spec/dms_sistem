@@ -131,6 +131,7 @@ class CrewSertifikatServices
             ->actions([
                 Action::make('view')
                     ->button()
+                    ->markAsRead()
                     ->url(url("/crew/all-crews/{$data->crew->id}?relation=1")),
             ])
             ->sendToDatabase($recipient);

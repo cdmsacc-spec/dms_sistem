@@ -49,6 +49,7 @@ class CrewInterviewForm
                         DatePicker::make('tanggal')
                             ->label('Tanggal Interview')
                             ->columnSpan(4)
+                            ->displayFormat('d-M-Y')
                             ->prefixIcon('heroicon-m-calendar')
                             ->native(false)
                             ->required()

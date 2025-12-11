@@ -47,12 +47,14 @@ class HistoryDokumenRelationManager extends RelationManager
                 DatePicker::make('tanggal_terbit')
                     ->label('Tanggal Terbit')
                     ->live()
+                    ->displayFormat('d-M-Y')
                     ->required()
                     ->native(false),
                 DatePicker::make('tanggal_expired')
                     ->label('Tanggal Expired')
                     ->required(false)
                     ->nullable()
+                    ->displayFormat('d-M-Y')
                     ->live()
                     ->reactive()
                     ->default(null)
@@ -63,6 +65,7 @@ class HistoryDokumenRelationManager extends RelationManager
                 FileUpload::make('file')
                     ->label('Upload File')
                     ->disk('public')
+
                     ->directory('documents')
                     ->columnSpan(2)
                     ->required()
@@ -107,11 +110,13 @@ class HistoryDokumenRelationManager extends RelationManager
                         $record->id == $record->newQuery()->latest('created_at')->value('id') ? 'info' : null
                     ),
                 TextColumn::make('tanggal_terbit')
+                    ->formatStateUsing(fn($state) =>Carbon::parse($state)->format('d-M-Y'))
                     ->color(
                         fn($record) =>
                         $record->id == $record->newQuery()->latest('created_at')->value('id') ? 'info' : null
                     ),
                 TextColumn::make('tanggal_expired')
+                    ->formatStateUsing(fn($record) => $record->tanggal_expired ? Carbon::parse($record->tanggal_expired)->format('d-M-Y') : 'Tidak Ada Tangal Expired')
                     ->default('Tidak Ada Tangal Expired')
                     ->color(
                         fn($record) =>

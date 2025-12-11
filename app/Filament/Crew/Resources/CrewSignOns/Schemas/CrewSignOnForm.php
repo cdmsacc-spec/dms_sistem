@@ -118,6 +118,7 @@ class CrewSignOnForm
                             ->dehydrated(true),
 
                         DatePicker::make('start_date')
+                            ->displayFormat('d-M-Y')
                             ->label('Tanggal Mulai Kontrak')
                             ->prefixIcon('heroicon-m-calendar')
                             ->native(false)
@@ -132,6 +133,7 @@ class CrewSignOnForm
                             ->dehydrated(false),
 
                         DatePicker::make('end_date')
+                            ->displayFormat('d-M-Y')
                             ->label('Tanggal Selesai Kontrak')
                             ->prefixIcon('heroicon-m-calendar')
                             ->native(false)

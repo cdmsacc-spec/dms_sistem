@@ -22,6 +22,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Hugomyb\FilamentMediaAction\Actions\MediaAction;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 class HistorySignOff extends ManageRelatedRecords
@@ -48,6 +49,12 @@ class HistorySignOff extends ManageRelatedRecords
             ->components([
                 TextEntry::make('keterangan'),
                 TextEntry::make('tanggal')
+                    ->getStateUsing(function ($record) {
+                        if (!$record) {
+                            return '-';
+                        }
+                        return $record?->tanggal == null ? '-' : Carbon::parse($record?->tanggal)->format('d-M-Y');
+                    })
                     ->icon('heroicon-m-calendar'),
                 TextEntry::make('keterangan'),
                 TextEntry::make('alasanBerhenti.nama_alasan')->label('Alasan Berhenti'),
@@ -66,7 +73,8 @@ class HistorySignOff extends ManageRelatedRecords
                     ->label('No. ')
                     ->width('sm')
                     ->rowIndex(),
-                TextColumn::make('tanggal'),
+                TextColumn::make('tanggal')
+                    ->formatStateUsing(fn($record) => $record->tanggal ? Carbon::parse($record->tanggal)->format('d-M-Y') : 'Tidak Ada Tangal Expired'),
                 TextColumn::make('keterangan'),
                 TextColumn::make('alasanBerhenti.nama_alasan')->label('Alasan Berhenti'),
             ])

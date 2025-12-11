@@ -141,6 +141,7 @@ class DokumenServices
             ->actions([
                 Action::make('view')
                     ->button()
+                    ->markAsRead()
                     ->url(url("/document/dokumens/$data->id")),
             ])
             ->sendToDatabase($recipient);

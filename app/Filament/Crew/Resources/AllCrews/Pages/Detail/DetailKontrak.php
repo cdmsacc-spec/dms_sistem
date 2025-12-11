@@ -115,12 +115,15 @@ class DetailKontrak extends Page
                     ->schema([
                         TextEntry::make('gaji')
                             ->label('Gaji')
+                            ->prefix('Rp.')
                             ->money('IDR'),
                         TextEntry::make('kontrak_lanjutan')
                             ->label('Jenis Kontrak')
                             ->formatStateUsing(fn($state) => $state == 1 ? 'Lanjutan' : 'Baru'),
-                        TextEntry::make('start_date')->label('Mulai Kontrak'),
-                        TextEntry::make('end_date')->label('Selesai Kontrak'),
+                        TextEntry::make('start_date')->label('Mulai Kontrak')
+                            ->formatStateUsing(fn($state) => Carbon::parse($state)->format('d-M-Y')),
+                        TextEntry::make('end_date')->label('Selesai Kontrak')
+                            ->formatStateUsing(fn($state) => Carbon::parse($state)->format('d-M-Y')),
                         TextEntry::make('summary')
                             ->label('Summary Penilaian')
                             ->getStateUsing(function ($record) {

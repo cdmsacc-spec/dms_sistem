@@ -124,11 +124,13 @@ class DokumenForm
                             ->label('Tanggal Terbit')
                             ->live()
                             ->required()
+                            ->displayFormat('d-M-Y')
                             ->native(false),
                         DatePicker::make('tanggal_expired')
                             ->label('Tanggal Expired')
                             ->required(false)
                             ->nullable()
+                            ->displayFormat('d-M-Y')
                             ->live()
                             ->reactive()
                             ->default(null)

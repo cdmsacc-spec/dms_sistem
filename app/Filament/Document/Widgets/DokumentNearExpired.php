@@ -16,6 +16,7 @@ use Filament\Tables\View\TablesRenderHook;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 class DokumentNearExpired extends TableWidget
 {
@@ -65,6 +66,7 @@ class DokumentNearExpired extends TableWidget
                     ->label('Nomor dokumen')
                     ->searchable(),
                 TextColumn::make('latestHistory.tanggal_expired')
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('d-M-Y'))
                     ->label('Expired')
                     ->badge()
                     ->color('danger'),

@@ -22,6 +22,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Hugomyb\FilamentMediaAction\Actions\MediaAction;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 class HistoryMutasiPromosi extends ManageRelatedRecords
@@ -75,8 +76,10 @@ class HistoryMutasiPromosi extends ManageRelatedRecords
                 TextColumn::make('kontrak_lanjutan')
                     ->label('Jenis Kontrak')
                     ->formatStateUsing(fn($state) => $state == true ? 'Lanjutan' : 'Baru'),
-                TextColumn::make('start_date'),
-                TextColumn::make('end_date'),
+                TextColumn::make('start_date')
+                    ->formatStateUsing(fn($record) => $record->start_date ? Carbon::parse($record->start_date)->format('d-M-Y') : '-'),
+                TextColumn::make('end_date')
+                    ->formatStateUsing(fn($record) => $record->end_date ? Carbon::parse($record->end_date)->format('d-M-Y') : '-'),
                 TextColumn::make('kontrak_lanjutan')
                     ->label('Jenis Kontrak')
                     ->formatStateUsing(fn($state) => $state == true ? 'Lanjutan' : 'Baru'),

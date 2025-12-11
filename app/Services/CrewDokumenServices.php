@@ -131,6 +131,7 @@ class CrewDokumenServices
             ->actions([
                 Action::make('view')
                     ->button()
+                    ->markAsRead()
                     ->url(url("/crew/all-crews/{$data->crew->id}")),
             ])
             ->sendToDatabase($recipient);

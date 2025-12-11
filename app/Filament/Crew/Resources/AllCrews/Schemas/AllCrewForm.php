@@ -53,7 +53,7 @@ class AllCrewForm
                                         'xl' => 3
                                     ])
                                     ->schema([
-                                      
+
                                         Select::make('posisi_dilamar')
                                             ->label('Posisi Dilamar')
                                             ->placeholder('')
@@ -82,6 +82,7 @@ class AllCrewForm
 
                                         DatePicker::make('tanggal_lahir')
                                             ->label('Tanggal Lahir')
+                                            ->displayFormat('d-M-Y')
                                             ->prefixIcon('heroicon-m-calendar')
                                             ->native(false)
                                             ->required(),

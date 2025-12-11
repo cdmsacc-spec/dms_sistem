@@ -70,7 +70,7 @@ class DokumenInfolist
                                     ->first();
 
                                 return $data?->tanggal_terbit
-                                    ? Carbon::parse($data->tanggal_terbit)->format('d-m-Y')
+                                    ? Carbon::parse($data->tanggal_terbit)->format('d-M-Y')
                                     : '-';
                             }),
 
@@ -83,7 +83,7 @@ class DokumenInfolist
                                     ->orderByDesc('id')
                                     ->first();
 
-                                return $data?->tanggal_expired ?? 'Tidak ada expired';
+                                return $data?->tanggal_expired ==null ? 'Tidak ada expired' : Carbon::parse($data->tanggal_expired)->format('d-M-Y');
                             }),
                     ]),
 

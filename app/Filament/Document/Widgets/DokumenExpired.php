@@ -11,6 +11,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 class DokumenExpired extends TableWidget
 {
@@ -27,6 +28,7 @@ class DokumenExpired extends TableWidget
                 TextColumn::make('JenisDokumen.nama_dokumen'),
                 TextColumn::make('latestHistory.nomor_dokumen'),
                 TextColumn::make('latestHistory.tanggal_expired')
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('d-M-Y'))
                     ->label('Expired')
                     ->badge()
                     ->color('danger'),

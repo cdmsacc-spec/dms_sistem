@@ -166,6 +166,7 @@ class MutasiRelationManager extends RelationManager
                         DatePicker::make('start_date')
                             ->label('Tanggal Mulai Kontrak')
                             ->prefixIcon('heroicon-m-calendar')
+                            ->displayFormat('d-M-Y')
                             ->native(false)
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
@@ -176,6 +177,7 @@ class MutasiRelationManager extends RelationManager
                             ->dehydrated(false),
 
                         DatePicker::make('end_date')
+                            ->displayFormat('d-M-Y')
                             ->label('Tanggal Selesai Kontrak')
                             ->prefixIcon('heroicon-m-calendar')
                             ->native(false)
@@ -223,8 +225,10 @@ class MutasiRelationManager extends RelationManager
                 TextColumn::make('kontrak_lanjutan')
                     ->label('Jenis Kontrak')
                     ->formatStateUsing(fn($state) => $state == true ? 'Lanjutan' : 'Baru'),
-                TextColumn::make('start_date'),
-                TextColumn::make('end_date'),
+                TextColumn::make('start_date')
+                    ->date('d-M-Y'),
+                TextColumn::make('end_date')
+                    ->date('d-M-Y'),
                 TextColumn::make('status_kontrak')
                     ->label('Status')
                     ->badge()

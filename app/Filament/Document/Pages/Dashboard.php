@@ -99,10 +99,12 @@ class Dashboard extends PagesDashboard
                         DatePicker::make('dari_tanggal')
                             ->label('')
                             ->native(false)
+                            ->displayFormat('d-M-Y')
                             ->placeholder('dari tanggal'),
                         DatePicker::make('sampai_tanggal')
                             ->label('')
                             ->native(false)
+                            ->displayFormat('d-M-Y')
                             ->placeholder('sampai tanggal'),
                     ]),
                 ])->headerActions([
@@ -165,10 +167,10 @@ class Dashboard extends PagesDashboard
             return null;
         }
 
-        if (Dokumen::where('status', '!=', 'expired')->exists()) {
-            // Log::info('Tidak ada dokumen expired');
-            return null;
-        }
+        //   if (Dokumen::where('status', '!=', 'expired')->exists()) {
+        //       // Log::info('Tidak ada dokumen expired');
+        //        return null;
+        //   }
 
         session()->forget('show_expired_modal');
         return Blade::render('

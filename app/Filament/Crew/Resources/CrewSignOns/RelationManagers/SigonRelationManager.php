@@ -134,6 +134,7 @@ class SigonRelationManager extends RelationManager
 
                         DatePicker::make('start_date')
                             ->label('Tanggal Mulai Kontrak')
+                            ->displayFormat('d-M-Y')
                             ->prefixIcon('heroicon-m-calendar')
                             ->native(false)
                             ->reactive()
@@ -146,6 +147,7 @@ class SigonRelationManager extends RelationManager
                             }),
 
                         DatePicker::make('end_date')
+                            ->displayFormat('d-M-Y')
                             ->label('Tanggal Selesai Kontrak')
                             ->prefixIcon('heroicon-m-calendar')
                             ->native(false)
@@ -203,8 +205,10 @@ class SigonRelationManager extends RelationManager
                 TextColumn::make('kontrak_lanjutan')
                     ->label('Jenis Kontrak')
                     ->formatStateUsing(fn($state) => $state == true ? 'Lanjutan' : 'Baru'),
-                TextColumn::make('start_date'),
-                TextColumn::make('end_date'),
+                TextColumn::make('start_date')
+                    ->date('d-M-Y'),
+                TextColumn::make('end_date')
+                    ->date('d-M-Y'),
                 TextColumn::make('status_kontrak')
                     ->label('Status')
                     ->badge()
@@ -249,7 +253,7 @@ class SigonRelationManager extends RelationManager
                     ->button()
                     ->slideOver()
 
-                    ->hidden(fn($record) => $record->kategory === 'promosi' ||$record->status_kontrak !='active' && $record->status_kontrak != 'waiting approval')
+                    ->hidden(fn($record) => $record->kategory === 'promosi' || $record->status_kontrak != 'active' && $record->status_kontrak != 'waiting approval')
                     ->after(function ($record) {
                         if (!empty($record->file)) {
                             $record->crew()->update(['status' => 'active']);

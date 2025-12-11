@@ -34,10 +34,10 @@ class CrewAppraisalsTable
                 TextColumn::make('kapal.nama_kapal')
                     ->searchable(),
                 TextColumn::make('start_date')
-                    ->date()
+                    ->date('d-M-Y')
                     ->sortable(),
                 TextColumn::make('end_date')
-                    ->date()
+                    ->date('d-M-Y')
                     ->sortable(),
                 TextColumn::make('status_kontrak')
                     ->badge()

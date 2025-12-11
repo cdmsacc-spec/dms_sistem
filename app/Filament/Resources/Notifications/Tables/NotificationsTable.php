@@ -35,16 +35,19 @@ class NotificationsTable
             ->recordActions([
                 Action::make('view')->color('success')->icon('heroicon-o-eye')->button()
                     ->visible(fn($record) => $record->data['actions'] == null ? false : true)
-                    ->url(function ($record) {
+                    ->action(function ($record, $livewire) {
+                        $record->update([
+                            'read_at' => now()->format('Y-m-d H:i:s'), // atau Carbon::now()
+                        ]);
 
-                        if ($record->data['actions'] == null) {
-                            return null;
+                        $url = $record->data['actions'][0]['url'] ?? null;
+                        if ($url) {
+                            $url = str_replace('/document', '/admin', $url);
+                            $url = str_replace('/crew', '/admin', $url);
+                            $livewire->redirect($url);
                         }
-                        $url = $record->data['actions'][0]['url'];
-                        $url = str_replace('/document', '/admin', $url);
-                        $url = str_replace('/crew', '/admin', $url);
-                        return url($url);
                     }),
+
                 DeleteAction::make()->button()
             ])
             ->toolbarActions([

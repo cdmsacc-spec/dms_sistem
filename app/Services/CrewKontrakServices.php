@@ -133,6 +133,7 @@ class CrewKontrakServices
             ->actions([
                 Action::make('view')
                     ->button()
+                    ->markAsRead()
                     ->url(url("/crew/all-crews/{$data->id}/detail_kontak")),
             ])
             ->sendToDatabase($recipient);

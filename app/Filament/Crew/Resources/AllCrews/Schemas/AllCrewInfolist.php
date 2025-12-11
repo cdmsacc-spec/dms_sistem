@@ -71,7 +71,13 @@ class AllCrewInfolist
                                 ImageEntry::make('avatar')->label('Foto Crew')->columnSpan(1)->disk('public'),
 
                                 TextEntry::make('tempat_lahir')->label('Tempat Lahir'),
-                                TextEntry::make('tanggal_lahir')->label('Tanggal Lahir'),
+                                TextEntry::make('tanggal_lahir')->label('Tanggal Lahir')
+                                    ->getStateUsing(function ($record) {
+                                        if (!$record) {
+                                            return '-';
+                                        }
+                                        return $record?->tanggal_lahir == null ? '-' : Carbon::parse($record?->tanggal_lahir)->format('d-M-Y');
+                                    }),
                                 TextEntry::make('tempat_lahir')
                                     ->label('Usia')
                                     ->formatStateUsing(fn($record) => $record->tanggal_lahir

@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Filament\Tables\View\TablesRenderHook;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 class SertifikatCrewNearExpiry extends TableWidget
 {
@@ -55,6 +56,7 @@ class SertifikatCrewNearExpiry extends TableWidget
                     ->label('Nama Sertifikat')
                     ->searchable(),
                 TextColumn::make('tanggal_expired')
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('d-M-Y'))
                     ->label('Expired')
                     ->badge()
                     ->color('danger'),

@@ -27,6 +27,7 @@ use Filament\Tables\Table;
 use Hugomyb\FilamentMediaAction\Actions\MediaAction;
 use Illuminate\Support\Facades\Storage;
 use Filament\Support\Enums\Alignment;
+use Illuminate\Support\Carbon;
 
 class HistoryInterview extends ManageRelatedRecords
 {
@@ -41,6 +42,7 @@ class HistoryInterview extends ManageRelatedRecords
         return $schema
             ->components([
                 DatePicker::make('tanggal')
+                    ->displayFormat('d-M-Y')
                     ->label('Tanggal Interview')
                     ->columnSpan(2)
                     ->prefixIcon('heroicon-m-calendar')
@@ -89,6 +91,7 @@ class HistoryInterview extends ManageRelatedRecords
                     ->rowIndex(),
                 TextColumn::make('tanggal')
                     ->badge()
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('d-M-Y'))
                     ->color('success')
                     ->icon('heroicon-m-calendar'),
                 TextColumn::make('keterangan'),

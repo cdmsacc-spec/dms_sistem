@@ -24,6 +24,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Tables\View\TablesRenderHook;
 use Hugomyb\FilamentMediaAction\Actions\MediaAction;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Storage;
 
@@ -71,9 +72,11 @@ class DokumenRelationManager extends RelationManager
                 DatePicker::make('tanggal_terbit')
                     ->prefixIcon('heroicon-m-calendar')
                     ->required()
+                    ->displayFormat('d-M-Y')
                     ->native(false)
                     ->columns(1),
                 DatePicker::make('tanggal_expired')
+                    ->displayFormat('d-M-Y')
                     ->prefixIcon('heroicon-m-calendar')
                     ->native(false)
                     ->columns(1),
@@ -139,8 +142,10 @@ class DokumenRelationManager extends RelationManager
                 TextColumn::make('kategory')
                     ->searchable(),
                 TextColumn::make('tempat_dikeluarkan'),
-                TextColumn::make('tanggal_terbit'),
-                TextColumn::make('tanggal_expired'),
+                TextColumn::make('tanggal_terbit')
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('d-M-Y')),
+                TextColumn::make('tanggal_expired')
+                    ->formatStateUsing(fn($record) => $record->tanggal_expired ? Carbon::parse($record->tanggal_expired)->format('d-M-Y') : 'Tidak Ada Tangal Expired'),
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn($state) => match ($state) {

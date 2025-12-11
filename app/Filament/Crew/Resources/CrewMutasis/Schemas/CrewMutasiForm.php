@@ -151,7 +151,7 @@ class CrewMutasiForm
                                     $set('end_date', null);
                                 }
                             }),
-                            
+
                         Select::make('kategory')
                             ->label('Kategory')
                             ->native(false)
@@ -166,6 +166,7 @@ class CrewMutasiForm
                         DatePicker::make('start_date')
                             ->label('Tanggal Mulai Kontrak')
                             ->prefixIcon('heroicon-m-calendar')
+                            ->displayFormat('d-M-Y')
                             ->native(false)
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
@@ -177,6 +178,7 @@ class CrewMutasiForm
                             ->helperText(fn($record) => 'Old ' . $record->lastKontrak->start_date),
 
                         DatePicker::make('end_date')
+                            ->displayFormat('d-M-Y')
                             ->label('Tanggal Selesai Kontrak')
                             ->prefixIcon('heroicon-m-calendar')
                             ->native(false)

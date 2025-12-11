@@ -67,11 +67,7 @@ class JabatanResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
-    {
-        return $schema
-            ->components([]);
-    }
+
 
     public static function table(Table $table): Table
     {
