@@ -95,6 +95,7 @@ class HistoryDokumenRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('nomor_dokumen')
             ->defaultSort('created_at', 'desc')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')
@@ -110,7 +111,7 @@ class HistoryDokumenRelationManager extends RelationManager
                         $record->id == $record->newQuery()->latest('created_at')->value('id') ? 'info' : null
                     ),
                 TextColumn::make('tanggal_terbit')
-                    ->formatStateUsing(fn($state) =>Carbon::parse($state)->format('d-M-Y'))
+                    ->formatStateUsing(fn($state) => Carbon::parse($state)->format('d-M-Y'))
                     ->color(
                         fn($record) =>
                         $record->id == $record->newQuery()->latest('created_at')->value('id') ? 'info' : null

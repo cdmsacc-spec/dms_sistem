@@ -58,6 +58,7 @@ class HistorySignOn extends ManageRelatedRecords
             ->recordTitleAttribute('nomor_dokumen')
             ->emptyStateHeading('Tidak Ada Data')
             ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('index')
@@ -85,7 +86,6 @@ class HistorySignOn extends ManageRelatedRecords
                         'waiting approval' => 'info',
                         'expired' => 'danger',
                     }),
-                TextColumn::make('end_date'),
             ])
             ->filters([
                 //

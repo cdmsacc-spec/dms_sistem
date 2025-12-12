@@ -37,6 +37,7 @@ class KontrakCrewNearExpiry extends TableWidget
         return $table
             ->query(fn(): Builder => CrewKontrak::query()->where('status_kontrak', 'active')->where('near_expiry', true))
             ->heading('')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')

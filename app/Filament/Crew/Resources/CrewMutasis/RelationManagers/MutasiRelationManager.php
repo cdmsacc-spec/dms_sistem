@@ -208,6 +208,7 @@ class MutasiRelationManager extends RelationManager
         return $table
             ->emptyStateHeading('Tidak Ada Data')
             ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->defaultSort('created_at', 'desc')
             ->heading('')
             ->recordTitleAttribute('nomor_dokumen')
@@ -237,7 +238,6 @@ class MutasiRelationManager extends RelationManager
                         'expired' => 'danger',
                         'waiting approval' => 'warning',
                     }),
-                TextColumn::make('end_date'),
             ])
             ->filters([
                 //

@@ -50,6 +50,9 @@ class DokumentNearExpired extends TableWidget
                     ->label('Perusahaan')
                     ->collapsible(),
             ])
+            ->emptyStateHeading('Tidak Ada Data')
+            ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->groupingSettingsHidden()
             ->columns([
                 TextColumn::make('index')

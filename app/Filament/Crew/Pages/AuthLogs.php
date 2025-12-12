@@ -44,6 +44,9 @@ class AuthLogs extends Page implements HasTable
                 config('filament-authentication-log.sort.column'),
                 config('filament-authentication-log.sort.direction'),
             )
+            ->emptyStateHeading('Tidak Ada Data')
+            ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')

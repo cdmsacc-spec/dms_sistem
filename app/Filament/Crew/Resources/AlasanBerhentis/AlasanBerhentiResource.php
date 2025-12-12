@@ -44,6 +44,7 @@ class AlasanBerhentiResource extends Resource
     {
         return $table
             ->recordTitleAttribute('nama_alasan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')
@@ -58,7 +59,7 @@ class AlasanBerhentiResource extends Resource
                 //
             ])
             ->recordActions([
-                EditAction::make()  ->button(),
+                EditAction::make()->button(),
                 DeleteAction::make()->button(),
             ])
             ->toolbarActions([

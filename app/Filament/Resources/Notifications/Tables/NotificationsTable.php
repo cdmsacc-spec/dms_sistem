@@ -17,6 +17,9 @@ class NotificationsTable
         return $table
             ->modifyQueryUsing(fn($query) => $query->where('notifiable_id', auth()->user()->id))
             ->defaultSort('created_at', 'desc')
+            ->emptyStateHeading('Tidak Ada Data')
+            ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('data.title')
                     ->label('Title')
@@ -27,7 +30,7 @@ class NotificationsTable
                 IconColumn::make('read_at')
                     ->boolean()
                     ->label('Read'),
-                TextColumn::make('created_at')->dateTime(),
+                TextColumn::make('created_at')->dateTime('d-M-Y'),
             ])
             ->filters([
                 //

@@ -58,6 +58,9 @@ class ToReminderCrewResource extends Resource
         return $table
             ->recordTitleAttribute('nama')
             ->defaultGroup('type')
+            ->emptyStateHeading('Tidak Ada Data')
+            ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')

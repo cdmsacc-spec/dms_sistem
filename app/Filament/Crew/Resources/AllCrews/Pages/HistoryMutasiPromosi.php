@@ -62,6 +62,7 @@ class HistoryMutasiPromosi extends ManageRelatedRecords
             ->emptyStateHeading('Tidak Ada Data')
             ->emptyStateDescription('belum ada data ditambahkan')
             ->defaultSort('created_at', 'desc')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')
@@ -80,9 +81,7 @@ class HistoryMutasiPromosi extends ManageRelatedRecords
                     ->formatStateUsing(fn($record) => $record->start_date ? Carbon::parse($record->start_date)->format('d-M-Y') : '-'),
                 TextColumn::make('end_date')
                     ->formatStateUsing(fn($record) => $record->end_date ? Carbon::parse($record->end_date)->format('d-M-Y') : '-'),
-                TextColumn::make('kontrak_lanjutan')
-                    ->label('Jenis Kontrak')
-                    ->formatStateUsing(fn($state) => $state == true ? 'Lanjutan' : 'Baru'),
+
                 TextColumn::make('status_kontrak')
                     ->label('Status')
                     ->badge()
@@ -91,7 +90,6 @@ class HistoryMutasiPromosi extends ManageRelatedRecords
                         'waiting approval' => 'info',
                         'expired' => 'danger',
                     }),
-                TextColumn::make('end_date'),
             ])
             ->filters([
                 //

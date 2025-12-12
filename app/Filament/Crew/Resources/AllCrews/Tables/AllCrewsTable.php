@@ -26,6 +26,9 @@ class AllCrewsTable
     {
         return $table
             ->defaultSort('created_at', 'desc')
+            ->emptyStateHeading('Tidak Ada Data')
+            ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 ImageColumn::make('avatar')
                     ->disk('public')

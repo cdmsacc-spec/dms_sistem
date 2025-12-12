@@ -17,6 +17,7 @@ class CrewAppraisalsTable
         return $table
             ->emptyStateHeading('Tidak Ada Data')
             ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->defaultSort('created_at', 'desc')
             ->modifyQueryUsing(fn($query) => $query->where('status_kontrak', 'active')->withAvg('appraisal', 'nilai'))
 

@@ -61,6 +61,7 @@ class JenisKapalResource extends Resource
     {
         return $table
             ->recordTitleAttribute('nama_jenis')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')

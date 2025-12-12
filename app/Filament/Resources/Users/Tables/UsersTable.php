@@ -15,6 +15,7 @@ class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultPaginationPageOption('5')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),

@@ -53,6 +53,9 @@ class ReminderCrewResource extends Resource
     {
         return $table
             ->recordTitleAttribute('reminder_hari')
+            ->emptyStateHeading('Tidak Ada Data')
+            ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')

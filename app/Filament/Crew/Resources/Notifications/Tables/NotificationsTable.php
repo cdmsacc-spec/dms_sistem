@@ -17,6 +17,9 @@ class NotificationsTable
         return $table
             ->modifyQueryUsing(fn($query) => $query->where('notifiable_id', auth()->user()->id))
             ->defaultSort('created_at', 'desc')
+            ->emptyStateHeading('Tidak Ada Data')
+            ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('data.title')
                     ->label('Title')
@@ -27,7 +30,7 @@ class NotificationsTable
                 IconColumn::make('read_at')
                     ->boolean()
                     ->label('Read'),
-                TextColumn::make('created_at')->dateTime(),
+                TextColumn::make('created_at')->dateTime('d-M-Y'),
             ])
             ->filters([
                 //
@@ -35,7 +38,7 @@ class NotificationsTable
             ->recordActions([
                 Action::make('view')->color('success')->icon('heroicon-o-eye')->button()
                     ->visible(fn($record) => $record->data['actions'] == null ? false : true)
-                   ->action(function ($record, $livewire) {
+                    ->action(function ($record, $livewire) {
                         $record->update([
                             'read_at' => now()->format('Y-m-d H:i:s'), // atau Carbon::now()
                         ]);

@@ -73,6 +73,7 @@ class JabatanResource extends Resource
     {
         return $table
             ->recordTitleAttribute('nama_jabatan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')
@@ -99,7 +100,7 @@ class JabatanResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make() 
+                    DeleteBulkAction::make()
                 ]),
             ]);
     }

@@ -21,6 +21,7 @@ class DokumenExpired extends TableWidget
     {
         return $table
             ->heading('')
+            ->defaultPaginationPageOption('5')
             ->query(fn(): Builder =>  Dokumen::query()->where('status', 'expired'))
             ->columns([
                 TextColumn::make('kapal.perusahaan.nama_perusahaan'),

@@ -66,7 +66,9 @@ class HistorySignOff extends ManageRelatedRecords
         return $table
             ->heading('')
             ->recordTitleAttribute('keterangan')
+            ->emptyStateHeading('Tidak Ada Data')
             ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('index')

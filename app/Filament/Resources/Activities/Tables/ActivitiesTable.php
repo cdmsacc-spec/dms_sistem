@@ -18,6 +18,9 @@ class ActivitiesTable
     {
         return $table
             ->defaultSort('created_at', 'desc')
+            ->emptyStateHeading('Tidak Ada Data')
+            ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')
@@ -25,7 +28,7 @@ class ActivitiesTable
                     ->rowIndex(),
                 TextColumn::make('description')
                     ->label('Author')
-                    ->formatStateUsing(fn($record, $state) => $record->causer==null? 'sistem': $record->causer->name)
+                    ->formatStateUsing(fn($record, $state) => $record->causer == null ? 'sistem' : $record->causer->name)
                     ->icon('heroicon-o-user')
                     ->color('info'),
                 TextColumn::make('event')

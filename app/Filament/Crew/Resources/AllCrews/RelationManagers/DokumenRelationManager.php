@@ -127,6 +127,7 @@ class DokumenRelationManager extends RelationManager
             ->recordTitleAttribute('nomor_dokumen')
             ->emptyStateHeading('Tidak Ada Data')
             ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->heading('')
             ->columns([
                 TextColumn::make('index')

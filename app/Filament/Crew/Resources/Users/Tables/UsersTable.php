@@ -25,6 +25,9 @@ class UsersTable
                     $q->where('name', 'staff_crew');
                 });
             })
+            ->emptyStateHeading('Tidak Ada Data')
+            ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 ImageColumn::make('avatar')
                     ->disk('public')

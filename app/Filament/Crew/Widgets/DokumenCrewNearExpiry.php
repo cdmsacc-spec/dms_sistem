@@ -38,6 +38,7 @@ class DokumenCrewNearExpiry extends TableWidget
         return $table
             ->query(fn(): Builder => CrewDokumen::query()->where('status', 'near expiry'))
             ->heading('')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')

@@ -25,6 +25,7 @@ class UsersTable
                     $q->where('name', 'staff_dokumen');
                 });
             })
+            ->defaultPaginationPageOption('5')
             ->columns([
                 ImageColumn::make('avatar')
                     ->disk('public')

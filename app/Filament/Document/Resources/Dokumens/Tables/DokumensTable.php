@@ -44,6 +44,7 @@ class DokumensTable
             ->emptyStateHeading('Tidak Ada Data')
             ->defaultSort('created_at', 'desc')
             ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('kapal.perusahaan.nama_perusahaan')
                     ->searchable()
@@ -71,7 +72,7 @@ class DokumensTable
                             ? $record->jarak_hari . ' hari'
                             : 'Tanpa Expired'
                     ),
-                    TextColumn::make('last_comment')->html()
+                TextColumn::make('last_comment')->html()
             ])
             ->filters([
                 Filter::make('kapal_perusahaan')

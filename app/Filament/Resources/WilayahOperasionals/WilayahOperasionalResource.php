@@ -88,6 +88,7 @@ class WilayahOperasionalResource extends Resource
     {
         return $table
             ->recordTitleAttribute('nama_wilayah')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')
@@ -128,7 +129,7 @@ class WilayahOperasionalResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make() 
+                    DeleteBulkAction::make()
                 ]),
             ]);
     }

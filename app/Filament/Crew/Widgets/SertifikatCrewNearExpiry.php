@@ -37,6 +37,7 @@ class SertifikatCrewNearExpiry extends TableWidget
         return $table
             ->query(fn(): Builder => CrewSertifikat::query()->where('status', 'near expiry'))
             ->heading('')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')

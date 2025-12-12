@@ -75,6 +75,7 @@ class LookupResource extends Resource
         return $table
             ->defaultGroup('type')
             ->recordTitleAttribute('type')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('type')
                     ->searchable(),

@@ -139,6 +139,7 @@ class PerusahaanResource extends Resource
             ->emptyStateHeading('Tidak Ada Data')
             ->defaultSort('created_at', 'desc')
             ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')

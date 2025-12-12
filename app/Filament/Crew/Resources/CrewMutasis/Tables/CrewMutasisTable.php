@@ -17,9 +17,10 @@ class CrewMutasisTable
     {
         return $table
             ->modifyQueryUsing(fn($query) => $query->where('status', 'active'))
-            ->emptyStateHeading('Tidak Ada Data')
             ->defaultSort('created_at', 'desc')
+            ->emptyStateHeading('Tidak Ada Data')
             ->emptyStateDescription('belum ada data ditambahkan')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')

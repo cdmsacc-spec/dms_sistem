@@ -148,6 +148,7 @@ class KapalResource extends Resource
     {
         return $table
             ->recordTitleAttribute('nama_kapal')
+            ->defaultPaginationPageOption('5')
             ->columns([
                 TextColumn::make('index')
                     ->label('No. ')
