@@ -39,6 +39,7 @@ class DokumenController extends Controller
                 'tempat_penerbitan',
                 'created_at'
             ])
+            
                 ->when(
                     $status,
                     fn($q) =>
@@ -156,6 +157,7 @@ class DokumenController extends Controller
                 'jenis_dokumen'     => $data->jenisDokumen->nama_jenis ?? null,
                 'status'            => $data->status,
                 'tempat_penerbitan' => $data->tempat_penerbitan,
+                'penerbit'          => $data->penerbit,
                 'created_at'        => $data->created_at,
                 'author' => $data->author,
                 'tanggal_terbit'   => $data->latestHistory->tanggal_terbit ?? null,

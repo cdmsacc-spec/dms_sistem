@@ -152,4 +152,22 @@ class AuthController extends Controller
             return new ArrayResource(false, $th->getMessage(), null);
         }
     }
+
+     public function showBadgeNotification(Request $request)
+    {
+        try {
+            $token = $request->bearerToken();
+
+            $user = User::where('auth_token', $token)->first();
+            if (!$user) {
+                return new ArrayResource(false, 'token anda tidak valid, silahkan melakukan login ulang', null);
+            }
+
+            $data = Notification::where('notifiable_id', $user->id)    ->whereNull('read_at')->count();
+         
+            return new ArrayResource(true, 'badge notification', $data);
+        } catch (\Throwable $th) {
+            return new ArrayResource(false, $th->getMessage(), null);
+        }
+    }
 }

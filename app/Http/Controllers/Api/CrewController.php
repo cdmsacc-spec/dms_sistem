@@ -26,6 +26,7 @@ class CrewController extends Controller
         try {
             $token = $request->bearerToken();
             $status = $request->status ?? null;
+            $search  = $request->search ?? null;
 
             $user = User::where('auth_token', $token)->first();
             if (!$user) {
@@ -42,6 +43,10 @@ class CrewController extends Controller
                 'status',
                 'avatar'
             ])
+                ->when($search, function ($q) use ($search) {
+                    $q->where('nama_crew', 'ILIKE', "%{$search}%");
+                })
+
                 ->when(
                     $status,
                     fn($q) =>
@@ -153,6 +158,8 @@ class CrewController extends Controller
 
             ])->findOrFail($id);
 
+            $data->avatar =  $data->avatar == null ?  url('storage/crew/avatar/default.jpg')  : asset('storage/' . $data->avatar);
+
             $data->dokumen->transform(function ($item) {
                 if (!$item) return $item;
 
@@ -179,7 +186,7 @@ class CrewController extends Controller
                     "end_date" => $item["end_date"],
                     "kontrak_lanjutan" => $item["kontrak_lanjutan"],
                     "status_kontrak" => $item["status_kontrak"],
-                    "file" => $item->avatar == null ?  url('storage/crew/avatar/default.jpg') : asset('storage/' . $item->file),
+                    "file" =>  $item->file ? asset('storage/' . $item->file) : null,
                     "perusahaan" => $item["perusahaan"] == null ? null : $item["perusahaan"]["nama_perusahaan"],
                     "jabatan" => $item["jabatan"] == null ? null : $item["jabatan"]["nama_jabatan"],
                     "wilayah" => $item["wilayah"] == null ? null : $item["wilayah"]["nama_wilayah"],
@@ -217,7 +224,7 @@ class CrewController extends Controller
             $total     = $lakiLaki + $perempuan;
 
             $query = Crew::when($carbonDate, function ($query, $carbonDate) {
-                return $query->whereMonth('created_at', $carbonDate->month)
+                return $query
                     ->whereYear('created_at', $carbonDate->year);
             });
 

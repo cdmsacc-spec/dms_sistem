@@ -13,7 +13,8 @@ Route::get('/user', function (Request $request) {
 Route::prefix('/user')->controller(AuthController::class)->group(function () {
     Route::post('/login', 'login');
     Route::post('/autologin', 'autologin');
-      Route::post('/notification', 'showNotification');
+    Route::post('/notification', 'showNotification');
+    Route::post('/notification/badge', 'showBadgeNotification');
 });
 
 Route::prefix('/dokumen')->controller(DokumenController::class)->group(function () {
@@ -29,5 +30,3 @@ Route::prefix('/crew')->controller(CrewController::class)->group(function () {
     Route::post('/history_kontrak', 'crewHistoryKontrak');
     Route::post('/history_sign_off', 'crewHistorySignOff');
 });
-
-
