@@ -43,24 +43,15 @@ class CrewAnalytic extends StatsOverviewWidget
 
 
         $totalStatusActive = Crew::where('status', 'active')
-            ->when($carbonDate, function ($query, $carbonDate) {
-                return $query->whereMonth('created_at', $carbonDate->month)
-                    ->whereYear('created_at', $carbonDate->year);
-            })
+           
             ->count();
 
         $totalStatusInactive = Crew::where('status', 'inactive')
-            ->when($carbonDate, function ($query, $carbonDate) {
-                return $query->whereMonth('created_at', $carbonDate->month)
-                    ->whereYear('created_at', $carbonDate->year);
-            })
+          
             ->count();
 
         $totalStatusStandby = Crew::where('status', 'standby')
-            ->when($carbonDate, function ($query, $carbonDate) {
-                return $query->whereMonth('created_at', $carbonDate->month)
-                    ->whereYear('created_at', $carbonDate->year);
-            })
+          
             ->count();
 
         $data = [

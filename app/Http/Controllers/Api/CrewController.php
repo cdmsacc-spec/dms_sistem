@@ -223,10 +223,7 @@ class CrewController extends Controller
             $perempuan = $counts['Perempuan'] ?? 0;
             $total     = $lakiLaki + $perempuan;
 
-            $query = Crew::when($carbonDate, function ($query, $carbonDate) {
-                return $query
-                    ->whereYear('created_at', $carbonDate->year);
-            });
+            $query = Crew::query();
 
             $totalStatusActive = $query->where('status', 'active')->count();
             $totalStatusInactive = $query->where('status', 'inactive')->count();
