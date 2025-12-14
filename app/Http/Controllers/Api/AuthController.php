@@ -142,6 +142,7 @@ class AuthController extends Controller
                     'id' => $item->id,
                     'title' => $item->data['title'] ?? null,
                     'body' => $item->data['body'] ?? null,
+                    'read_at' =>$item->data['read_at'] ?? null,
                     'url' => $item->data['actions'][0]['url'] ?? null,
                     'created_at' => $item->created_at,
 
