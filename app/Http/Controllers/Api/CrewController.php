@@ -223,13 +223,12 @@ class CrewController extends Controller
             $perempuan = $counts['Perempuan'] ?? 0;
             $total     = $lakiLaki + $perempuan;
 
-            $query = Crew::query();
 
-            $totalStatusActive = $query->where('status', 'active')->count();
-            $totalStatusInactive = $query->where('status', 'inactive')->count();
-            $totalStatusStandby = $query->where('status', 'standby')->count();
-            $totalStatusReadyInterview = $query->where('status', 'ready for interview')->count();
-            $totalStatusRejected = $query->where('status', 'rejected')->count();
+            $totalStatusActive =  Crew::where('status', 'active')->count();
+            $totalStatusInactive =  Crew::where('status', 'inactive')->count();
+            $totalStatusStandby =  Crew::where('status', 'standby')->count();
+            $totalStatusReadyInterview =  Crew::where('status', 'ready for interview')->count();
+            $totalStatusRejected =  Crew::where('status', 'rejected')->count();
 
 
             //==>activity berjalanF
