@@ -139,11 +139,55 @@ class AuthController extends Controller
             $token = $request->bearerToken();
 
             $data = User::with('roles')->where('auth_token', $token)->first();
+            $roles = $data->roles->pluck('name')->toArray();
+
             if ($data == null) {
                 return new ArrayResource(false, 'sesi login anda telah berakhir, silahkan login kembali', null);
             }
+            $isDokumenRole = collect($roles)->intersect([
+                'staff_dokumen',
+                'manager_dokumen',
+                'operation_dokumen',
+                'super_admin',
+            ])->isNotEmpty();
 
-            $perusahaan = Perusahaan::select('id', 'nama_perusahaan')->get();
+            $isCrewRole = collect($roles)->intersect([
+                'staff_crew',
+                'manager_crew',
+                'super_admin',
+            ])->isNotEmpty();
+
+            $perusahaan = $isDokumenRole ? Perusahaan::query()
+                ->leftJoin('kapals', 'kapals.id_perusahaan', '=', 'perusahaans.id')
+                ->leftJoin('dokumens', 'dokumens.id_kapal', '=', 'kapals.id')
+                ->select(
+                    'perusahaans.id',
+                    'perusahaans.nama_perusahaan',
+                    'perusahaans.kode_perusahaan',
+                    DB::raw('COUNT(DISTINCT kapals.id) as total_kapal'),
+                    DB::raw('COUNT(dokumens.id) as total_dokumen')
+                )
+                ->groupBy(
+                    'perusahaans.id',
+                    'perusahaans.nama_perusahaan',
+                    'perusahaans.kode_perusahaan'
+                )
+                ->get() : Perusahaan::query()
+                ->leftJoin('kapals', 'kapals.id_perusahaan', '=', 'perusahaans.id')
+                ->leftJoin('crew_kontraks', 'crew_kontraks.id_kapal', '=', 'kapals.id')
+                ->select(
+                    'perusahaans.id',
+                    'perusahaans.nama_perusahaan',
+                    'perusahaans.kode_perusahaan',
+                    DB::raw('COUNT(DISTINCT kapals.id) as total_kapal'),
+                    DB::raw("COUNT(CASE WHEN crew_kontraks.status_kontrak = 'active' THEN 1 END) as total_active")
+                )
+                ->groupBy(
+                    'perusahaans.id',
+                    'perusahaans.nama_perusahaan',
+                    'perusahaans.kode_perusahaan'
+                )
+                ->get();
             $jenis_dokumen = JenisDokumen::select('id', 'nama_jenis')->get();
             $kapal = Kapal::select('id', 'nama_kapal')->get();
             $jabatan = Jabatan::select('id', 'nama_jabatan')->get();
