@@ -225,6 +225,8 @@ class CrewController extends Controller
 
 
             $totalStatusActive =  Crew::where('status', 'active')->count();
+                        $totalStatusDraft =  Crew::where('status', 'draft')->count();
+
             $totalStatusInactive =  Crew::where('status', 'inactive')->count();
             $totalStatusStandby =  Crew::where('status', 'standby')->count();
             $totalStatusReadyInterview =  Crew::where('status', 'ready for interview')->count();
@@ -291,6 +293,7 @@ class CrewController extends Controller
                 "crew_status_count" => [
                     "active" => $totalStatusActive,
                     "inactive" => $totalStatusInactive,
+                    "draft" => $totalStatusDraft,
                     "standby" => $totalStatusStandby,
                     "ready_interview" => $totalStatusReadyInterview,
                     "rejected" => $totalStatusRejected,

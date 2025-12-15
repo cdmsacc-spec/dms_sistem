@@ -89,6 +89,7 @@ class EditProfiles extends Page implements Forms\Contracts\HasForms
         if (!empty($data['c'])) {
             $data['c'] = Hash::make($data['c']);
             $data['password'] =  $data['c'];
+            unset($data['c'], $data['c']);
         } else {
             unset($data['c'], $data['c']);
         }
