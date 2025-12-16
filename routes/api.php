@@ -14,6 +14,7 @@ Route::prefix('/user')->controller(AuthController::class)->group(function () {
     Route::post('/login', 'login');
     Route::post('/autologin', 'autologin');
     Route::post('/notification', 'showNotification');
+    Route::post('/notification/update', 'UpdateStatusNotification');
     Route::post('/notification/badge', 'showBadgeNotification');
 });
 

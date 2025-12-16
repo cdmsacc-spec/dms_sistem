@@ -13,6 +13,7 @@ use App\Models\Perusahaan;
 use App\Models\User;
 use App\Models\WilayahOperasional;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -220,13 +221,27 @@ class AuthController extends Controller
     {
         try {
             $token = $request->bearerToken();
+            $filter = $request->filter;
 
             $user = User::where('auth_token', $token)->first();
             if (!$user) {
                 return new ArrayResource(false, 'token anda tidak valid, silahkan melakukan login ulang', null);
             }
 
-            $data = Notification::where('notifiable_id', $user->id)->latest()->paginate(10);
+            $data = Notification::where('notifiable_id', $user->id)
+                ->when(
+                    $filter === 'unread',
+                    fn($q) =>
+                    $q->whereNull('read_at')
+                )
+                ->when(
+                    $filter === 'read',
+                    fn($q) =>
+                    $q->whereNotNull('read_at')
+                )
+                ->latest()
+                ->paginate(10);
+
             $data->getCollection()->transform(function ($item) {
                 return [
                     'id' => $item->id,
@@ -239,6 +254,43 @@ class AuthController extends Controller
                 ];
             });
             return new ListResource(true, 'list notification', $data);
+        } catch (\Throwable $th) {
+            return new ArrayResource(false, $th->getMessage(), null);
+        }
+    }
+
+    public function UpdateStatusNotification(Request $request)
+    {
+        try {
+            $token = $request->bearerToken();
+            $id = $request->id;
+            $user = User::where('auth_token', $token)->first();
+            if (!$user) {
+                return new ArrayResource(false, 'token anda tidak valid, silahkan melakukan login ulang', null);
+            }
+            
+            $notification = $user->notifications()
+                ->where('id', $id)
+                ->first();
+
+            if (!$notification) {
+                return new ArrayResource(
+                    false,
+                    'Notification tidak ditemukan',
+                    null
+                );
+            }
+
+            // ✅ Tandai sebagai sudah dibaca
+            if ($notification->read_at === null) {
+                $notification->markAsRead();
+            }
+
+            return new ArrayResource(
+                true,
+                'Notification berhasil dibaca',
+                true
+            );
         } catch (\Throwable $th) {
             return new ArrayResource(false, $th->getMessage(), null);
         }

@@ -23,7 +23,7 @@ class NotificationsTable
             ->emptyStateDescription('belum ada data ditambahkan')
             ->defaultPaginationPageOption('5')
             ->columns([
-                TextColumn::make('data.title')
+                TextColumn::make('id')
                     ->label('Title')
                     ->wrap(),
                 TextColumn::make('data.body')
