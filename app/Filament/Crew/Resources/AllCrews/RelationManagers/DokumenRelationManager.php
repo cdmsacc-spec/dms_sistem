@@ -2,6 +2,7 @@
 
 namespace App\Filament\Crew\Resources\AllCrews\RelationManagers;
 
+use App\Models\Lookup;
 use Filament\Actions\Action;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
@@ -46,10 +47,12 @@ class DokumenRelationManager extends RelationManager
                     ->columnSpan(1)
                     ->placeholder('')
                     ->required()
-                    ->options([
-                        'Document Pelaut' => 'Document Pelaut',
-                        'Sertifikat Keahlian / Pengukuhan' => 'Sertifikat Keahlian / Pengukuhan',
-                    ]),
+                    ->searchable()
+                    ->preload()
+                    ->options(Lookup::where('type', 'dokumen_crew')
+                        ->where('code',  'kategory_dokumen_crew')
+                        ->pluck('name', 'name')
+                        ->toArray()),
                 TextInput::make('nomor_dokumen')
                     ->required()
                     ->columns(1),
@@ -58,14 +61,12 @@ class DokumenRelationManager extends RelationManager
                     ->placeholder('')
                     ->native(false)
                     ->required()
-                    ->options([
-                        'Passport' => 'Passport',
-                        'Seaman Book' => 'Seaman Book',
-                        'MCU' => 'MCU',
-                        'COC' => 'COC',
-                        'COE' => 'COE',
-                        'GMDSS' => 'GMDSS'
-                    ]),
+                    ->searchable()
+                    ->preload()
+                    ->options(Lookup::where('type', 'dokumen_crew')
+                        ->where('code',  'jenis_dokumen_crew')
+                        ->pluck('name', 'name')
+                        ->toArray()),
                 TextInput::make('tempat_dikeluarkan')
                     ->required()
                     ->columns(1),

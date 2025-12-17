@@ -39,6 +39,7 @@ class LookupResource extends Resource
                     ->searchable()
                     ->options([
                         'sertified_kapal' => 'sertified_kapal',
+                        'dokumen_crew' => 'dokumen_crew',
                         'nomor_versi_dokumen' => 'nomor_versi_dokumen',
                         'interview' => 'interview',
                         //'signon' => 'signon',
@@ -55,6 +56,7 @@ class LookupResource extends Resource
                         $type = $get('type');
                         return match ($type) {
                             'sertified_kapal' => ['sk' => 'sk'],
+                            'dokumen_crew'=> ['jenis_dokumen_crew'=>'jenis_dokumen_crew', 'kategory_dokumen_crew'=>'kategory_dokumen_crew', 'kategory_certificate_crew'=>'kategory_certificate_crew'],
                             'nomor_versi_dokumen' => ['sign_on' => 'sign_on'],
                             'interview' => ['crewing' => 'crewing', 'user(operations/technique)' => 'user(operations/technique)', 'staff_rekrutmen' => 'staff_rekrutmen', 'manager_crew' => 'manager_crew'],
                             //'signon' => ['dibuat_oleh' => 'dibuat_oleh', 'diperiksa_oleh' => 'diperiksa_oleh', 'diketahui_oleh_1' => 'diketahui_oleh_1', 'diketahui_oleh_2' => 'diketahui_oleh_2', 'disetujui_oleh_1' => 'disetujui_oleh_1', 'disetujui_oleh_2' => 'disetujui_oleh_2'],

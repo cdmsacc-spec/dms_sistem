@@ -2,6 +2,7 @@
 
 namespace App\Filament\Crew\Resources\AllCrews\RelationManagers;
 
+use App\Models\Lookup;
 use Filament\Actions\Action;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
@@ -41,10 +42,12 @@ class SertifikatRelationManager extends RelationManager
                     ->placeholder('')
                     ->native(false)
                     ->required()
-                    ->options([
-                        'Keahlian STCW' => 'Keahlian STCW',
-                        'Non-STCW' => 'Non-STCW'
-                    ]),
+                    ->searchable()
+                    ->preload()
+                    ->options(Lookup::where('type', 'dokumen_crew')
+                        ->where('code',  'kategory_certificate_crew')
+                        ->pluck('name', 'name')
+                        ->toArray()),
                 TextInput::make('nomor_sertifikat')
                     ->required()
                     ->columns(1),
