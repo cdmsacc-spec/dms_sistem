@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Jabatans;
 
 use App\Filament\Resources\Jabatans\Pages\ManageJabatans;
 use App\Models\Jabatan;
+use App\Models\Lookup;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -22,6 +23,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 class JabatanResource extends Resource
@@ -50,20 +52,34 @@ class JabatanResource extends Resource
                     ->searchable()
                     ->placeholder('')
                     ->preload()
-                    ->options([
+                    ->options(collect([
                         'perwira' => 'Perwira',
-                        'non-perwira' => 'Non-Perwira'
-                    ]),
+                        'non-perwira' => 'Non Perwira',
+                    ])->merge(
+                        Lookup::where('type', 'jabatan_crew')
+                            ->where('code', 'golongan')
+                            ->pluck('name')
+                            ->mapWithKeys(fn($name) => [
+                                Str::title($name) => Str::title($name)
+                            ])
+                    )->toArray()),
                 Select::make('devisi')
                     ->native(false)
                     ->required()
                     ->searchable()
                     ->placeholder('')
                     ->preload()
-                    ->options([
+                    ->options(collect([
                         'Deck' => 'Deck',
-                        'Mesin' => 'Mesin'
-                    ]),
+                        'Mesin' => 'Mesin',
+                    ])->merge(
+                        Lookup::where('type', 'jabatan_crew')
+                            ->where('code', 'divisi')
+                            ->pluck('name')
+                            ->mapWithKeys(fn($name) => [
+                                Str::title($name) => Str::title($name)
+                            ])
+                    )->toArray()),
             ]);
     }
 
