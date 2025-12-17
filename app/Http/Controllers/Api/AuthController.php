@@ -217,6 +217,30 @@ class AuthController extends Controller
         }
     }
 
+    public function logout(Request $request)
+    {
+        try {
+            $token = $request->bearerToken();
+
+            $user = User::where('auth_token', $token)->first();
+            if (!$user) {
+                return new ArrayResource(false, 'token anda tidak valid, silahkan melakukan login ulang', null);
+            }
+            $success = $user->update([
+                'fcm_token'  => null,
+                'auth_token' => null,
+            ]);
+
+            return new ArrayResource(
+                $success,
+                $success ? 'Logout berhasil' : 'Logout gagal',
+                $success
+            );
+        } catch (\Throwable $th) {
+            return new ArrayResource(false, $th->getMessage(), null);
+        }
+    }
+
     public function showNotification(Request $request)
     {
         try {
@@ -268,7 +292,7 @@ class AuthController extends Controller
             if (!$user) {
                 return new ArrayResource(false, 'token anda tidak valid, silahkan melakukan login ulang', null);
             }
-            
+
             $notification = $user->notifications()
                 ->where('id', $id)
                 ->first();
