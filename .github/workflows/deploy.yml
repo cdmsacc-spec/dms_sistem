@@ -141,9 +141,8 @@ jobs:
           php artisan route:cache
           php artisan view:cache
           # permissions untuk Nginx/PHP-FPM
-          chown -R ${USER}:${USER} . || true
-          chgrp -R www-data storage bootstrap/cache || true
-          chmod -R ug+rwx storage bootstrap/cache
+          chgrp -R www-data bootstrap/cache || true
+          chmod -R ug+rwx bootstrap/cache || true
           "
 
       - name: Migrate DB
