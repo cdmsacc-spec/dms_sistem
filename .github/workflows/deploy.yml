@@ -65,142 +65,116 @@ jobs:
           name: app
           path: app.tar.gz
 
-# ==============================
-# DEPLOY
-# ==============================
   deploy:
     name: Deploy to Production
     needs: build
     runs-on: ubuntu-latest
     environment: production
-
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: app
+          path: .
 
-      - name: Setup SSH
+      - name: Install ssh key
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: |
+            ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Add host to known_hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
 
-# ==============================
-# PREPARE RELEASE
-# ==============================
       - name: Upload & extract release
         run: |
-          RELEASE=$(date +%Y%m%d%H%M%S)-${GITHUB_SHA::7}
-          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
-
-          ssh -p "${{ secrets.SSH_PORT }}" \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "mkdir -p ${{ secrets.APP_DIR }}/releases/$RELEASE"
-
-          scp -P "${{ secrets.SSH_PORT }}" app.tar.gz \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.APP_DIR }}/releases/$RELEASE/
-
-          ssh -p "${{ secrets.SSH_PORT }}" \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "cd ${{ secrets.APP_DIR }}/releases/$RELEASE && tar -xzf app.tar.gz && rm app.tar.gz"
-
-# ==============================
-# ENSURE SHARED DIRS
-# ==============================
-      - name: Ensure shared directories
+          REL=$(date +%Y%m%d%H%M%S)-${GITHUB_SHA::7}
+          echo "RELEASE=$REL" >> $GITHUB_ENV
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.APP_DIR }}/releases/$REL"
+          scp -P "${{ secrets.SSH_PORT }}" app.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.APP_DIR }}/releases/$REL/
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.APP_DIR }}/releases/$REL && tar -xzf app.tar.gz && rm app.tar.gz"
+        
+        ##add
+      - name: Link shared storage & env
         run: |
-          ssh -p "${{ secrets.SSH_PORT }}" \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            mkdir -p ${{ secrets.APP_DIR }}/shared/storage
-            mkdir -p ${{ secrets.APP_DIR }}/shared/bootstrap-cache
-
-            chgrp -R www-data ${{ secrets.APP_DIR }}/shared || true
-            chmod -R ug+rwx ${{ secrets.APP_DIR }}/shared
-            "
-
-# ==============================
-# LINK SHARED
-# ==============================
-      - name: Link shared resources
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          cd ${{ secrets.APP_DIR }}/releases/$RELEASE
+      
+          ln -sfn ${{ secrets.APP_DIR }}/shared/storage storage
+          ln -sfn ${{ secrets.APP_DIR }}/shared/.env .env
+          "
+      - name: Link shared dirs (storage, env, bootstrap cache)
         run: |
-          ssh -p "${{ secrets.SSH_PORT }}" \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            cd ${{ secrets.APP_DIR }}/releases/$RELEASE
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          cd ${{ secrets.APP_DIR }}/releases/$RELEASE
+      
+          ln -sfn ${{ secrets.APP_DIR }}/shared/storage storage
+          ln -sfn ${{ secrets.APP_DIR }}/shared/.env .env
+      
+          rm -rf bootstrap/cache
+          ln -sfn ${{ secrets.APP_DIR }}/shared/bootstrap-cache bootstrap/cache
+          "
 
-            ln -sfn ${{ secrets.APP_DIR }}/shared/storage storage
-            ln -sfn ${{ secrets.APP_DIR }}/shared/.env .env
+      ##- name: Write .env (from secret)
+      ##  env:
+      ##    ENV_PROD: ${{ secrets.ENV_PROD }}
+      ##  run: |
+      ##    printf "%s" "$ENV_PROD" > .env.local
+      ##    scp -P "${{ secrets.SSH_PORT }}" .env.local "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.APP_DIR }}/releases/$RELEASE/.env"
+      ##    rm -f .env.local
+      ##    ssh -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "chmod 600 '${{ secrets.APP_DIR }}/releases/$RELEASE/.env'"
 
-            rm -rf bootstrap/cache
-            ln -sfn ${{ secrets.APP_DIR }}/shared/bootstrap-cache bootstrap/cache
-            "
-
-# ==============================
-# INSTALL & OPTIMIZE
-# ==============================
-      - name: Composer install & optimize
+      - name: Composer install & Laravel optimize (server)
         run: |
-          ssh -p "${{ secrets.SSH_PORT }}" \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            set -e
-            cd ${{ secrets.APP_DIR }}/releases/$RELEASE
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          set -e
+          cd ${{ secrets.APP_DIR }}/releases/$RELEASE
+          # pastikan php8.2 dipakai
+          php -v
+          which composer || (curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer)
+          composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+          php artisan key:generate --force || true
+          php artisan storage:link || true
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          # permissions untuk Nginx/PHP-FPM
+          chown -R ${USER}:${USER} . || true
+          chgrp -R www-data storage bootstrap/cache || true
+          chmod -R ug+rwx storage bootstrap/cache
+          "
 
-            composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
-
-            php artisan key:generate --force || true
-            php artisan storage:link || true
-            php artisan config:clear
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            "
-
-# ==============================
-# DATABASE
-# ==============================
-      - name: Run migrations
+      - name: Migrate DB
         run: |
-          ssh -p "${{ secrets.SSH_PORT }}" \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            cd ${{ secrets.APP_DIR }}/releases/$RELEASE
-            php artisan migrate --force
-            "
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          set -e
+          cd ${{ secrets.APP_DIR }}/releases/$RELEASE
+          php artisan migrate --force
+          "
 
-# ==============================
-# ACTIVATE
-# ==============================
-      - name: Activate release
+      - name: Activate release (symlink swap)
         run: |
-          ssh -p "${{ secrets.SSH_PORT }}" \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            ln -sfn ${{ secrets.APP_DIR }}/releases/$RELEASE ${{ secrets.APP_DIR }}/current
-
-            sudo systemctl reload php8.2-fpm || true
-            sudo systemctl reload nginx || true
-            "
-
-# ==============================
-# POST DEPLOY
-# ==============================
-      - name: Restart queues
+          ssh -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "
+          set -e
+          ln -sfn '${{ secrets.APP_DIR }}/releases/$RELEASE' '${{ secrets.APP_DIR }}/current'
+          sudo -n systemctl reload php8.2-fpm || sudo -n systemctl reload php8.3-fpm || true
+          sudo -n systemctl reload nginx || true
+          "
+          
+      - name: Restart queues (if any)
         run: |
-          ssh -p "${{ secrets.SSH_PORT }}" \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            cd ${{ secrets.APP_DIR }}/current
-            php artisan queue:restart || true
-            "
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          cd ${{ secrets.APP_DIR }}/current
+          php artisan queue:restart || true
+          sudo supervisorctl reread || true
+          sudo supervisorctl update || true
+          "
 
-# ==============================
-# CLEANUP
-# ==============================
-      - name: Prune old releases
+      - name: Prune old releases (keep last 5)
         run: |
-          ssh -p "${{ secrets.SSH_PORT }}" \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            cd ${{ secrets.APP_DIR }}/releases
-            ls -1t | tail -n +6 | xargs -r rm -rf
-            "
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          cd ${{ secrets.APP_DIR }}/releases
+          ls -1t | tail -n +6 | xargs -r rm -rf
+          "
