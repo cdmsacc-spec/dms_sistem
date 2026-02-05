@@ -97,13 +97,24 @@ jobs:
           ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.APP_DIR }}/releases/$REL && tar -xzf app.tar.gz && rm app.tar.gz"
         
         ##add
-      - name: Link shared storage & env
+      ##- name: Link shared storage & env
+      ##  run: |
+      ##    ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+      ##    cd ${{ secrets.APP_DIR }}/releases/$RELEASE
+      ##
+      ##    ln -sfn ${{ secrets.APP_DIR }}/shared/storage storage
+      ##    ln -sfn ${{ secrets.APP_DIR }}/shared/.env .env
+      ##    "
+      - name: Link shared dirs (storage, env, bootstrap cache)
         run: |
           ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
           cd ${{ secrets.APP_DIR }}/releases/$RELEASE
       
           ln -sfn ${{ secrets.APP_DIR }}/shared/storage storage
           ln -sfn ${{ secrets.APP_DIR }}/shared/.env .env
+      
+          rm -rf bootstrap/cache
+          ln -sfn ${{ secrets.APP_DIR }}/shared/bootstrap-cache bootstrap/cache
           "
 
       ##- name: Write .env (from secret)
