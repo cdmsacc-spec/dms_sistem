@@ -31,17 +31,17 @@ class CrewAppraisalForm
                     ])
                     ->schema([
                         TextEntry::make('nama')
-                            ->state(fn($record): string => $record->crew->nama_crew),
+                            ->state(fn($record): string => $record->crew?->nama_crew?? ''),
                         TextEntry::make('no_telepon')
-                            ->state(fn($record): string => $record->crew->no_hp),
+                            ->state(fn($record): string => $record->crew?->no_hp?? ''),
                         TextEntry::make('alamat')
                             ->extraAttributes([
                                 'class' => 'truncate max-w-xs', // max-w-xs bisa diganti sesuai kebutuhan
-                                'title' => $record->crew->alamat_sekarang ?? '', // biar kalau hover muncul tooltip full
+                                'title' => $record->crew?->alamat_sekarang ?? '', // biar kalau hover muncul tooltip full
                             ])
-                            ->state(fn($record): string => $record->crew->alamat_sekarang),
+                            ->state(fn($record): string => $record->crew?->alamat_sekarang?? ''),
                         TextEntry::make('jenis_kelamin')
-                            ->state(fn($record): string => $record->crew->jenis_kelamin),
+                            ->state(fn($record): string => $record->crew?->jenis_kelamin?? ''),
                     ]),
 
                 Section::make('Kontrak Active')
@@ -57,7 +57,7 @@ class CrewAppraisalForm
                     ])
                     ->schema([
                         TextEntry::make('nama_perusahaan')
-                            ->state(fn($record): string => $record->perusahaan->nama_perusahaan),
+                            ->state(fn($record): string => $record->perusahaan?->nama_perusahaan?? ''),
                         TextEntry::make('appraisal_summary')
                             ->state(function ($record) { {
                                     $appraisals = $record->appraisal()->pluck('nilai');
@@ -77,9 +77,9 @@ class CrewAppraisalForm
                                 }
                             }),
                         TextEntry::make('start_date')
-                            ->state(fn($record): string => $record->start_date),
+                            ->state(fn($record): string => $record->start_date?? ''),
                         TextEntry::make('end_date')
-                            ->state(fn($record): string => $record->end_date),
+                            ->state(fn($record): string => $record->end_date?? ''),
                     ]),
 
                 Section::make('')
@@ -110,7 +110,7 @@ class CrewAppraisalForm
                             ])
                             ->getUploadedFileNameForStorageUsing(function ($file, callable $get, $record) {
                                 try {
-                                    $nama_crew = $record->crew->nama_crew ?? 'crew';
+                                    $nama_crew = $record->crew?->nama_crew ?? 'crew';
                                     $appraiser     = $get('aprraiser') ?? 'aprraiser';
                                     $now       = now()->format('YmdHis');
                                     $filename = strtolower(

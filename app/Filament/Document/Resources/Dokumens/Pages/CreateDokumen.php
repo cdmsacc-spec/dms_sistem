@@ -5,6 +5,8 @@ namespace App\Filament\Document\Resources\Dokumens\Pages;
 use App\Filament\Document\Resources\Dokumens\DokumenResource;
 use App\Filament\Document\Resources\Dokumens\RelationManagers\HistoryDokumenRelationManager;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 
 class CreateDokumen extends CreateRecord
 {
@@ -26,5 +28,20 @@ class CreateDokumen extends CreateRecord
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
+    }
+
+       protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
+    {
+        try {
+            return parent::handleRecordCreation($data);
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23505') {
+                throw ValidationException::withMessages([
+                    'historyDokumen.*.nomor_dokumen' => 'Nomor dokumen sudah digunakan.',
+                ]);
+            }
+
+            throw $e;
+        }
     }
 }

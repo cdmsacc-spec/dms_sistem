@@ -28,13 +28,13 @@ class CrewInterviewForm
                     ])
                     ->schema([
                         TextEntry::make('nama')
-                            ->state(fn($record): string => $record->nama_crew),
+                            ->state(fn($record): string => $record->nama_crew?? ''),
                         TextEntry::make('Posisi Dilamar')
-                            ->state(fn($record): string => $record->posisi_dilamar),
+                            ->state(fn($record): string => $record->posisi_dilamar?? ''),
                         TextEntry::make('Kebangsaan')
-                            ->state(fn($record): string => $record->kebangsaan),
+                            ->state(fn($record): string => $record->kebangsaan?? ''),
                         TextEntry::make('Alamat')
-                            ->state(fn($record): string => $record->alamat_ktp),
+                            ->state(fn($record): string => $record->alamat_ktp?? ''),
                     ]),
 
                 Section::make('')

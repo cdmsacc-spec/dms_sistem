@@ -137,6 +137,7 @@ class DokumenForm
                             ->native(false),
                         TextArea::make('nomor_dokumen')
                             ->required()
+                            ->unique(ignoreRecord: true)
                             ->rows(3)
                             ->columnSpan(1),
                         FileUpload::make('file')

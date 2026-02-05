@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Filament\Document\Resources\Dokumens\Pages;
-
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 use App\Filament\Document\Resources\Dokumens\DokumenResource;
 use App\Filament\Document\Resources\Dokumens\RelationManagers\HistoryDokumenRelationManager;
 use Filament\Actions\DeleteAction;
@@ -31,5 +32,19 @@ class EditDokumen extends EditRecord
     {
         return 'Edit Dokumen';
     }
- 
+
+    protected function handleRecordUpdate($record, array $data): \Illuminate\Database\Eloquent\Model
+    {
+        try {
+            return parent::handleRecordUpdate($record, $data);
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23505') {
+                throw ValidationException::withMessages([
+                    'historyDokumen.*.nomor_dokumen' => 'Nomor dokumen sudah digunakan.',
+                ]);
+            }
+
+            throw $e;
+        }
+    }
 }

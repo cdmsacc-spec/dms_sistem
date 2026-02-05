@@ -64,7 +64,7 @@ class AllCrewInfolist
                                     TextEntry::make('agama')->label('Agama'),
                                     TextEntry::make('kebangsaan')
                                         ->label('Kebangsaan')
-                                        ->formatStateUsing(fn($record) => $record->suku . ' ' . $record->kebangsaan),
+                                        ->formatStateUsing(fn($record) => $record->suku?? '' . ' ' . $record->kebangsaan??''),
                                     TextEntry::make('status_identitas')->label('Status Identitas'),
                                 ])->columnSpan(2),
 
@@ -117,8 +117,8 @@ class AllCrewInfolist
 
                         Tab::make('Fisik')
                             ->schema([
-                                TextEntry::make('tinggi_badan')->label('Tinggi Badan')->badge()->color('success')->formatStateUsing(fn($state) => $state . ' CM'),
-                                TextEntry::make('berat_badan')->label('Berat Badan')->badge()->color('success')->formatStateUsing(fn($state) => $state . ' KG'),
+                                TextEntry::make('tinggi_badan')->label('Tinggi Badan')->badge()->color('success')->formatStateUsing(fn($state) => $state??'' . ' CM'),
+                                TextEntry::make('berat_badan')->label('Berat Badan')->badge()->color('success')->formatStateUsing(fn($state) => $state??'' . ' KG'),
                                 TextEntry::make('ukuran_waerpack')->label('Ukuran Wearpack')->badge()->color('success'),
                                 TextEntry::make('ukuran_sepatu')->label('Ukuran Sepatu')->badge()->color('success'),
                             ])

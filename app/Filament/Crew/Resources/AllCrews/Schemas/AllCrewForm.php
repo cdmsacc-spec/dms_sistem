@@ -180,8 +180,8 @@ class AllCrewForm
                                     TextInput::make('email')->label('Email')->email()->required(),
                                     TextInput::make('no_hp')->label('No. HP')->required(),
                                     TextInput::make('no_hp_rumah')->label('No. Telp Rumah')->nullable(),
-                                    Textarea::make('alamat_ktp')->label('Alamat KTP')->columnSpan(1),
-                                    Textarea::make('alamat_sekarang')->label('Alamat Sekarang')->columnSpan(2),
+                                    Textarea::make('alamat_ktp')->label('Alamat KTP')->columnSpan(1)->required(),
+                                    Textarea::make('alamat_sekarang')->label('Alamat Sekarang')->columnSpan(2)->required(),
                                 ]),
                             Fieldset::make('Status Rumah')->schema([
                                 Radio::make('status_rumah')

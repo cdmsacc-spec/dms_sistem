@@ -29,9 +29,8 @@ class AppServiceProvider extends ServiceProvider
                     ->join('&');
 
                 $original = rtrim($url . '?' . $queryString, '?');
-
-                // Use the application key as the HMAC key
-                $key = config('app.key'); // Ensure app.key is properly set in .env
+               
+                $key = config('app.key'); 
 
                 if (empty($key)) {
                     throw new \RuntimeException('Application key is not set.');

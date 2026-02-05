@@ -43,7 +43,7 @@ class CrewSignoffForm
                             ->state(
                                 fn($record): string =>
                                 $record->lastKontrak?->jabatan
-                                    ? ($record->lastKontrak->jabatan->golongan . '-' . $record->lastKontrak->jabatan->nama_jabatan)
+                                    ? ($record->lastKontrak->jabatan?->golongan??'' . '-' . $record->lastKontrak->jabatan?->nama_jabatan??'')
                                     : '-'
                             ),
                         TextEntry::make('tanggal_mulai')

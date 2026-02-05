@@ -41,7 +41,7 @@ class CrewMutasiForm
                             ->dehydrated(false)
                             ->reactive()
                             ->columnSpan(2)
-                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak->perusahaan->nama_perusahaan)
+                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak?->perusahaan?->nama_perusahaan?? '')
                             ->afterStateUpdated(function ($set, $state) {
                                 if (empty($state)) {
                                     $set('id_kapal', null);
@@ -56,7 +56,7 @@ class CrewMutasiForm
                             ->options(WilayahOperasional::pluck('nama_wilayah', 'id'))
                             ->native(false)
                             ->dehydrated(false)
-                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak->wilayah->nama_wilayah),
+                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak?->wilayah?->nama_wilayah?? ''),
 
                         Select::make('id_kapal')
                             ->label('Nama Kapal')
@@ -84,7 +84,7 @@ class CrewMutasiForm
                             ->searchable()
                             ->native(false)
                             ->dehydrated(false)
-                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak->kapal->nama_kapal),
+                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak?->kapal?->nama_kapal??''),
 
 
                         Select::make('id_jabatan')
@@ -98,7 +98,7 @@ class CrewMutasiForm
                             ->preload()
                             ->native(false)
                             ->dehydrated(false)
-                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak->jabatan->nama_jabatan),
+                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak?->jabatan?->nama_jabatan?? ''),
 
                         Select::make('berangkat_dari')
                             ->label('Berangkat Dari')
@@ -111,7 +111,7 @@ class CrewMutasiForm
                             ])
                             ->native(false)
                             ->dehydrated(false)
-                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak->berangkat_dari),
+                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak?->berangkat_dari??''),
                     ]),
 
                 Section::make('Kontrak Crew')
@@ -129,7 +129,7 @@ class CrewMutasiForm
                             ->prefix('Rp.')
                             ->mask(RawJs::make('$money($input)'))
                             ->dehydrated(true)
-                            ->helperText(fn($record) => 'Old Rp.' . $record->lastKontrak->gaji),
+                            ->helperText(fn($record) => 'Old Rp.' . $record->lastKontrak?->gaji?? ''),
 
                         Select::make('kontrak_lanjutan')
                             ->label('Kontrak')
@@ -175,7 +175,7 @@ class CrewMutasiForm
                                 }
                             })
                             ->dehydrated(false)
-                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak->start_date),
+                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak?->start_date??''),
 
                         DatePicker::make('end_date')
                             ->displayFormat('d-M-Y')
@@ -184,7 +184,7 @@ class CrewMutasiForm
                             ->native(false)
                             ->disabled()
                             ->dehydrated(false)
-                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak->end_date),
+                            ->helperText(fn($record) => 'Old ' . $record->lastKontrak?->end_date??''),
                     ]),
             ]);
     }
