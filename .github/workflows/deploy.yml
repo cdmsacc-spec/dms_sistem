@@ -167,13 +167,16 @@ jobs:
           ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
           cd ${{ secrets.APP_DIR }}/current
           php artisan queue:restart || true
-          sudo supervisorctl reread || true
-          sudo supervisorctl update || true
           "
 
       - name: Prune old releases (keep last 5)
         run: |
           ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
           cd ${{ secrets.APP_DIR }}/releases
-          ls -1t | tail -n +6 | xargs -r rm -rf
+      
+          for dir in \$(ls -1t | tail -n +6); do
+            echo \"Pruning \$dir\"
+            rm -f \$dir/storage
+            rm -rf \$dir
+          done
           "
