@@ -106,14 +106,14 @@ jobs:
           ln -sfn ${{ secrets.APP_DIR }}/shared/.env .env
           "
 
-      - name: Write .env (from secret)
-        env:
-          ENV_PROD: ${{ secrets.ENV_PROD }}
-        run: |
-          printf "%s" "$ENV_PROD" > .env.local
-          scp -P "${{ secrets.SSH_PORT }}" .env.local "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.APP_DIR }}/releases/$RELEASE/.env"
-          rm -f .env.local
-          ssh -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "chmod 600 '${{ secrets.APP_DIR }}/releases/$RELEASE/.env'"
+      ##- name: Write .env (from secret)
+      ##  env:
+      ##    ENV_PROD: ${{ secrets.ENV_PROD }}
+      ##  run: |
+      ##    printf "%s" "$ENV_PROD" > .env.local
+      ##    scp -P "${{ secrets.SSH_PORT }}" .env.local "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.APP_DIR }}/releases/$RELEASE/.env"
+      ##    rm -f .env.local
+      ##    ssh -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "chmod 600 '${{ secrets.APP_DIR }}/releases/$RELEASE/.env'"
 
       - name: Composer install & Laravel optimize (server)
         run: |
