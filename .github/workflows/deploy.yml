@@ -48,9 +48,14 @@ jobs:
             echo "No frontend build step"
           fi
 
+      #- name: Package artifact
+      #  run: |
+      #    rm -rf .git tests node_modules vendor
+      #    tar -czf ../app.tar.gz ./
+      #    mv ../app.tar.gz .
       - name: Package artifact
         run: |
-          rm -rf .git tests node_modules vendor
+          rm -rf .git tests node_modules vendor storage bootstrap/cache
           tar -czf ../app.tar.gz ./
           mv ../app.tar.gz .
 
@@ -90,6 +95,16 @@ jobs:
           ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.APP_DIR }}/releases/$REL"
           scp -P "${{ secrets.SSH_PORT }}" app.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.APP_DIR }}/releases/$REL/
           ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.APP_DIR }}/releases/$REL && tar -xzf app.tar.gz && rm app.tar.gz"
+        
+        ##add
+      - name: Link shared storage & env
+        run: |
+          ssh -p "${{ secrets.SSH_PORT }}" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          cd ${{ secrets.APP_DIR }}/releases/$RELEASE
+      
+          ln -sfn ${{ secrets.APP_DIR }}/shared/storage storage
+          ln -sfn ${{ secrets.APP_DIR }}/shared/.env .env
+          "
 
       - name: Write .env (from secret)
         env:
