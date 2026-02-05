@@ -2,62 +2,62 @@ name: Deploy Production
 
 on:
   push:
-    branches: ["master"]
-
-concurrency:
-  group: production-deploy
-  cancel-in-progress: true
+    branches: [ "master" ]
 
 jobs:
-# ==============================
-# BUILD
-# ==============================
   build:
-    name: Build & Package
+    name: Build & Test
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup PHP 8.2
+      - name: Use PHP 8.2
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
-          extensions: mbstring, intl, pdo, pdo_mysql, gd, bcmath
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo, pdo_mysql, pdo_pgsql, gd, bcmath
           coverage: none
 
-      - name: Validate composer
+      - name: Validate composer.json & composer.lock
         run: composer validate --no-check-all
 
-      - name: Install composer deps (build check)
-        run: composer install --no-dev --prefer-dist --no-interaction
+      # Kita tidak perlu bawa vendor ke server; install di server saja
+      - name: Install dependencies (no-dev) for autoload dump check
+        run: composer install --no-interaction --prefer-dist --no-progress --no-dev --optimize-autoloader
 
-      - name: Setup Node
+      - name: Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
-      - name: Build frontend (auto detect)
+      - name: Frontend build (pnpm/yarn/npm autodetect)
         run: |
           if [ -f pnpm-lock.yaml ]; then
             corepack enable
-            pnpm install --frozen-lockfile
-            pnpm build
+            pnpm i --frozen-lockfile
+            pnpm run build
           elif [ -f yarn.lock ]; then
+            corepack enable
             yarn install --frozen-lockfile
             yarn build
           elif [ -f package-lock.json ]; then
             npm ci
             npm run build
           else
-            echo "No frontend build"
+            echo "No frontend build step"
           fi
 
+      #- name: Package artifact
+      #  run: |
+      #    rm -rf .git tests node_modules vendor
+      #    tar -czf ../app.tar.gz ./
+      #    mv ../app.tar.gz .
       - name: Package artifact
         run: |
           rm -rf .git tests node_modules vendor storage bootstrap/cache
-          tar -czf app.tar.gz .
+          tar -czf ../app.tar.gz ./
+          mv ../app.tar.gz .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
