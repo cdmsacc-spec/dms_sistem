@@ -226,25 +226,39 @@ class DokumenForm
                     })
                     ->table([
                         TableColumn::make('nama')->markAsRequired(),
-                        TableColumn::make('send_to')->markAsRequired(),
                         TableColumn::make('type')->markAsRequired()
-                            ->width('150px'),
+                            ->width('200px'),
+                        TableColumn::make('send_to')->markAsRequired(),
+
                     ])
                     ->schema([
                         TextInput::make('nama')
                             ->label('Nama')
                             ->required(),
-                        TextInput::make('send_to')
-                            ->label('Send To')
-                            ->required(),
                         Select::make('type')
                             ->native(false)
                             ->placeholder('')
                             ->required()
+                            ->live()
                             ->options([
                                 'wa' => "Wa",
                                 'email' => "Email",
-                            ])
+                            ]),
+                        TextInput::make('send_to')
+                            ->label('Send To')
+                            ->dehydrateStateUsing(function ($state, $get) {
+                                if ($get('type') === 'wa' && filled($state)) {
+                                    $cleanState = preg_replace('/[^0-9]/', '', $state);
+
+                                    return str_starts_with($cleanState, '0')
+                                        ? '62' . substr($cleanState, 1)
+                                        : $cleanState;
+                                }
+
+                                return $state;
+                            })
+                            ->required(),
+
                     ])
             ]);
     }

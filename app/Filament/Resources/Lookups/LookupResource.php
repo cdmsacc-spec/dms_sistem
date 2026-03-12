@@ -38,6 +38,7 @@ class LookupResource extends Resource
                     ->native(false)
                     ->placeholder('')
                     ->searchable()
+                    ->live()
                     ->options([
                         'sertified_kapal' => 'sertified_kapal',
                         'jabatan_crew' => 'jabatan_crew',
@@ -69,13 +70,19 @@ class LookupResource extends Resource
                             //'mutasi/promosi' => ['dibuat_oleh' => 'dibuat_oleh', 'diketahui_oleh' => 'diketahui_oleh', 'disetujui_oleh' => 'disetujui_oleh'],
                             'sign_off' => ['crewing_manager' => 'crewing_manager', 'direktur' => 'direktur'],
                             'template_form' => ['template_interview' => 'template_interview', 'template_sign_on' => 'template_sign_on', 'template_sign_off' => 'template_sign_off', 'template_mutasi_promosi', 'template_mutasi_promosi'],
-                            'reminder_time_wa' => ['reminder_time_wa_doc'=> 'doc', 'reminder_time_wa_crew'=> 'crew'],
+                            'reminder_time_wa' => ['reminder_time_wa_doc' => 'doc', 'reminder_time_wa_crew' => 'crew'],
                             default => [],
                         };
                     })
                     ->required(),
                 TextInput::make('name')
-                    ->required(),
+                    ->required()
+                    ->helperText(function ($get) {
+                        if ($get('type') === 'reminder_time_wa') {
+                            return 'Gunakan format jam, contoh 08:00';
+                        }
+                    })
+
             ]);
     }
 
