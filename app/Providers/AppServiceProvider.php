@@ -15,40 +15,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        URL::macro(
-            'alternateHasCorrectSignature',
-            function (Request $request, $absolute = true, array $ignoreQuery = []) {
-                $ignoreQuery[] = 'signature';
-
-                $absoluteUrl = url($request->path());
-                $url = $absolute ? $absoluteUrl : '/' . $request->path();
-
-                $queryString = collect(explode('&', (string) $request
-                    ->server->get('QUERY_STRING')))
-                    ->reject(fn($parameter) => in_array(Str::before($parameter, '='), $ignoreQuery))
-                    ->join('&');
-
-                $original = rtrim($url . '?' . $queryString, '?');
-               
-                $key = config('app.key'); 
-
-                if (empty($key)) {
-                    throw new \RuntimeException('Application key is not set.');
-                }
-
-                $signature = hash_hmac('sha256', $original, $key);
-                return hash_equals($signature, (string) $request->query('signature', ''));
-            }
-        );
-
-        URL::macro('alternateHasValidSignature', function (Request $request, $absolute = true, array $ignoreQuery = []) {
-            return URL::alternateHasCorrectSignature($request, $absolute, $ignoreQuery)
-                && URL::signatureHasNotExpired($request);
-        });
-
-        Request::macro('hasValidSignature', function ($absolute = true, array $ignoreQuery = []) {
-            return URL::alternateHasValidSignature($this, $absolute, $ignoreQuery);
-        });
+      
     }
 
     /**
@@ -56,9 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Model::unguard();
-        if ($this->app->environment('production')) {
-            URL::forceScheme('https');
-        }
+      
     }
 }

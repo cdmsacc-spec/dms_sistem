@@ -66,7 +66,7 @@ class Dashboard extends PagesDashboard
                             ->label('')
                             ->placeholder('perusahaan')
                             ->native(false)
-                            ->options(fn() => Perusahaan::pluck('nama_perusahaan', 'id'))
+                            ->options(Perusahaan::pluck('nama_perusahaan', 'id'))
                             ->searchable()
                             ->reactive()
                             ->preload()
@@ -80,6 +80,7 @@ class Dashboard extends PagesDashboard
                             ->label('')
                             ->placeholder('kapal')
                             ->native(false)
+                            ->preload()
                             ->options(function (callable $get) {
                                 $perusahaanId = $get('perusahaan');
                                 if ($perusahaanId) {
@@ -94,7 +95,8 @@ class Dashboard extends PagesDashboard
                             ->label('')
                             ->placeholder('jenis dokumen')
                             ->native(false)
-                            ->options(fn() => JenisDokumen::pluck('nama_jenis', 'id'))
+                            ->preload()
+                            ->options(JenisDokumen::pluck('nama_jenis', 'id'))
                             ->searchable(),
                         DatePicker::make('dari_tanggal')
                             ->label('')

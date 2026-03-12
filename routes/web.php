@@ -12,7 +12,6 @@ Route::get('/', function () {
 Route::get('generate/interview', [GenerateTemplateController::class, 'generateFormInterview'])
     ->name('generate.interview');
 
-
 Route::get('generate/signon', [GenerateTemplateController::class, 'generateFormSignon'])
     ->name('generate.signon');
 

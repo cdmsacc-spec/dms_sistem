@@ -11,3 +11,5 @@ Schedule::command('app:reminder-dokumen-commands')->everyMinute();
 Schedule::command('app:reminder-crew-dokumen-commands')->everyMinute();
 Schedule::command('app:reminder-crew-sertifikat-commands')->everyMinute();
 Schedule::command('app:reminder-crew-kontrak-commands')->everyMinute();
+Schedule::command('app:reminder-wa-crew')->everyMinute();
+

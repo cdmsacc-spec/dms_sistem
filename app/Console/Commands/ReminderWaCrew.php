@@ -2,20 +2,17 @@
 
 namespace App\Console\Commands;
 
-use App\Services\CrewDokumenServices;
 use App\Services\CrewNotidWaService;
 use Illuminate\Console\Command;
 
-class ReminderCrewDokumenCommands extends Command
+class ReminderWaCrew extends Command
 {
     /**
      * The name and signature of the console command.
-     *php artisan make:command UpdateDocumentStatus
-     *php artisan schedule:work
-
+     *
      * @var string
      */
-    protected $signature = 'app:reminder-crew-dokumen-commands';
+    protected $signature = 'app:reminder-wa-crew';
 
     /**
      * The console command description.
@@ -25,12 +22,13 @@ class ReminderCrewDokumenCommands extends Command
     protected $description = 'Command description';
 
     /**
-     * Execute the console command. 
+     * Execute the console command.
      */
-    public function handle(CrewDokumenServices $service): int
+    public function handle(CrewNotidWaService $service)
     {
         $service->updateAll();
-        $this->info('✅ Document statuses updated successfully.');
+
+        $this->info('✅ Document Crew statuses updated successfully.');
         return 0;
     }
 }

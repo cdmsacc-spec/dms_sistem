@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\SendFcmNotificationJob;
+use App\Jobs\SendWhatsAppNotificationJob;
 use App\Mail\MailServices;
 use App\Models\CrewDokumen;
 use App\Models\ReminderCrew;
@@ -11,10 +12,13 @@ use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class CrewDokumenServices
 {
+
+
     public function updateAll()
     {
         CrewDokumen::with('crew')
@@ -165,6 +169,7 @@ class CrewDokumenServices
                             subj: 'Informasi Dokumen Crew',
                             datetime: $today->format('d M Y'),
                         ));
+                } else {
                 }
             }
         });

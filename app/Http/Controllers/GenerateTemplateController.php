@@ -56,7 +56,7 @@ class GenerateTemplateController extends Controller
         $templates = $request->template_type;
         $kontrak = CrewKontrak::with([
             'wilayah:id,nama_wilayah,ttd_dibuat,ttd_diperiksa,ttd_diketahui_1,ttd_diketahui_2,ttd_disetujui_1,ttd_disetujui_2',
-            'jabatan:id,nama_jabatan',
+            'jabatan:id,nama_jabatan,kode_jabatan',
             'crew:id,nama_crew',
             'kapal:id,nama_kapal',
             'perusahaan:id,nama_perusahaan,kode_perusahaan,alamat,telp',
@@ -99,8 +99,9 @@ class GenerateTemplateController extends Controller
             $kontrak->save();
         }
 
-        $template->setValue('no_document', $kontrak->nomor_dokumen);
+        $template->setValue('no_document', Str::lower($kontrak->nomor_dokumen));
         $template->setValue('perusahaan', $kontrak->perusahaan->nama_perusahaan);
+        $template->setValue('perusahaan2', Str::lower($kontrak->perusahaan->nama_perusahaan));
         $template->setValue('code_perusahaan', $kontrak->perusahaan->kode_perusahaan);
         $template->setValue('bulan', $bulanRomawi);
         $template->setValue('tahun', $kontrak->created_at->format('Y'));
@@ -109,12 +110,14 @@ class GenerateTemplateController extends Controller
 
         // === BODY SECTION ===
         $template->setValue('nama', $kontrak->crew->nama_crew);
-        $template->setValue('jabatan', $kontrak->jabatan->nama_jabatan);
+        $template->setValue('kode_jabatan', $kontrak->jabatan->kode_jabatan);
+        $template->setValue('jabatan', $kontrak->jabatan->nama_jabatan . ' - ' . $kontrak->jabatan->kode_jabatan);
         $template->setValue('gaji', $kontrak->gaji);
         $template->setValue('status', 'Sign On / Crew PKL');
         $template->setValue('berangkat_dari', $kontrak->berangkat_dari);
         $template->setValue('wilayah', $kontrak->wilayah->nama_wilayah);
-        $template->setValue('kapal', $kontrak->kapal->nama_kapal);
+        $template->setValue('kapal', Str::lower($kontrak->kapal->nama_kapal));
+        $template->setValue('unit', Str::lower($kontrak->kapal->nama_kapal) . ' / ' . Str::lower($kontrak->perusahaan->nama_perusahaan));
         $template->setValue('start_date', Carbon::parse($kontrak->start_date)->format('d M Y'));
         $template->setValue('dikeluarkan', Carbon::parse($kontrak->start_date)->copy()->subDay()->format('d M Y'));
 

@@ -13,6 +13,11 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'qontaq' => [
+        'token' => env('QONTAQ_API_TOKEN'),
+        'template_id' => env('QONTAQ_TEMPLATE_ID'),
+        'channel_id' => env('QONTAQ_CHANNEL_ID'),
+    ],
 
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
