@@ -3,6 +3,7 @@
 namespace App\Filament\Document\Resources\Dokumens;
 
 use App\Filament\Document\Resources\Dokumens\Pages\CreateDokumen;
+use App\Filament\Document\Resources\Dokumens\Pages\CreateDokumenByKapal;
 use App\Filament\Document\Resources\Dokumens\Pages\DokumenAudit;
 use App\Filament\Document\Resources\Dokumens\Pages\EditDokumen;
 use App\Filament\Document\Resources\Dokumens\Pages\ListDokumens;
@@ -62,6 +63,7 @@ class DokumenResource extends Resource
         return [
             'index' => ListDokumens::route('/'),
             'create' => CreateDokumen::route('/create'),
+            'create-by-kapal' => CreateDokumenByKapal::route('/create-by-kapal'),
             'view' => ViewDokumen::route('/{record}'),
             'edit' => EditDokumen::route('/{record}/edit'),
             'audit' => DokumenAudit::route('/audit/{record}'),

@@ -36,7 +36,7 @@ class DokumensTable
                 Group::make('kapal.nama_kapal')
                     ->label('Kapal')
                     ->collapsible(),
-                Group::make('jenisDokumen.nama_dokumen')
+                Group::make('jenisDokumen.nama_jenis')
                     ->label('Jenis')
                     ->collapsible(),
             ])
@@ -103,12 +103,12 @@ class DokumensTable
                             ->native(false)
                             ->options(function (callable $get) {
                                 $perusahaanId = $get('perusahaan');
-                                if ($perusahaanId) {
-                                    return Kapal::where('id_perusahaan', $perusahaanId)
-                                        ->pluck('nama_kapal', 'id')
-                                        ->toArray();
-                                }
-                                return [];
+                                return Kapal::query()
+                                    ->when($perusahaanId, fn ($query) => 
+                                        $query->where('id_perusahaan', $perusahaanId)
+                                    )
+                                    ->pluck('nama_kapal', 'id')
+                                    ->toArray();
                             })
                     ])
                     ->query(function ($query, array $data) {

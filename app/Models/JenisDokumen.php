@@ -28,4 +28,9 @@ class JenisDokumen extends Model
     {
         return $this->hasMany(Dokumen::class, 'id_jenis_dokumen');
     }
+
+    public function jenisKapal()
+    {
+        return $this->belongsToMany(JenisKapal::class, 'jenis_kapal_dokumen', 'id_jenis_dokumen', 'id_jenis_kapal');
+    }
 }

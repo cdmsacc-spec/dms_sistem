@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -40,6 +41,13 @@ class JenisKapalResource extends Resource
                 TextInput::make('nama_jenis')
                     ->required()
                     ->columnSpanFull(),
+                Select::make('jenis_dokumen')
+                    ->label('Jenis Dokumen')
+                    ->multiple()
+                    ->relationship('jenis_dokumen', 'nama_jenis')
+                    ->preload()
+                    ->searchable()
+                    ->columnSpanFull(),
                 Textarea::make('deskripsi')
                     ->required()
                     ->columnSpanFull(),
@@ -52,6 +60,21 @@ class JenisKapalResource extends Resource
             ->components([
                 TextEntry::make('nama_jenis')
                     ->label('Nama Jenis'),
+                TextEntry::make('jenis_dokumen')
+                    ->label('Jenis Dokumen')
+                    ->html()
+                    ->getStateUsing(function ($record) {
+                        if ($record->jenis_dokumen->isEmpty()) {
+                            return '-';
+                        }
+
+                        return $record->jenis_dokumen
+                            ->values()
+                            ->map(fn ($item, $index) => ($index + 1) . '. ' . $item->nama_jenis)
+                            ->join("<br>");
+                    })
+                    ->listWithLineBreaks()
+                    ->columnSpanFull(),
                 TextEntry::make('deskripsi')
                     ->label('Deskripsi'),
             ]);
@@ -70,6 +93,21 @@ class JenisKapalResource extends Resource
                 TextColumn::make('nama_jenis')
                     ->label('Nama Jenis')
                     ->searchable(),
+                TextColumn::make('jenis_dokumen')
+                    ->label('Jenis Dokumen')
+                    ->badge()
+                    ->color('primary') // biru
+                    ->getStateUsing(function ($record) {
+                        if ($record->jenis_dokumen->isEmpty()) {
+                            return ['-'];
+                        }
+
+                        return $record->jenis_dokumen
+                            ->pluck('nama_jenis')
+                            ->toArray();
+                    })
+                    ->width(500)
+                    ->wrap(),
                 TextColumn::make('deskripsi')
                     ->label('Deskripsi')
                     ->searchable(),

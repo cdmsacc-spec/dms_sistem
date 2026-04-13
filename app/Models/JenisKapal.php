@@ -31,6 +31,11 @@ class JenisKapal extends Model
         return $this->hasMany(Kapal::class, 'id_jenis_kapal');
     }
 
+    public function jenis_dokumen()
+    {
+        return $this->belongsToMany(JenisDokumen::class, 'jenis_kapal_dokumen', 'id_jenis_kapal', 'id_jenis_dokumen');
+    }
+
     protected static function booted()
     {
         static::deleting(function ($model) {

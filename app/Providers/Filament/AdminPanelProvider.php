@@ -54,6 +54,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->favicon(asset('img/cdms_logo.png'))
             ->login(LoginAdmin::class)
             ->spa()
             ->userMenuItems([
