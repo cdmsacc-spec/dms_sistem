@@ -58,8 +58,7 @@ class DokumenInfolist
                     ->schema([
                         TextEntry::make('latestHistory.nomor_dokumen'),
                         TextEntry::make('jenisDokumen.nama_jenis'),
-                        TextEntry::make('penerbit'),
-                        TextEntry::make('tempat_penerbitan'),
+                        // TextEntry::make('tempat_penerbitan'),
                         TextEntry::make('tanggal_terbit')
                             ->getStateUsing(function ($record) {
                                 if (!$record) {
@@ -85,6 +84,8 @@ class DokumenInfolist
 
                                 return $data?->tanggal_expired ==null ? 'Tidak ada expired' : Carbon::parse($data->tanggal_expired)->format('d-M-Y');
                             }),
+                        TextEntry::make('penerbit'),
+                        
                     ]),
 
                 Section::make()
@@ -210,9 +211,9 @@ class DokumenInfolist
                                     ->icon('heroicon-o-user')
                                     ->color('success'),
 
-                                TextEntry::make('keterangan')
-                                    ->label('Keterangan')
-                                    ->columnSpanFull(),
+                                // TextEntry::make('keterangan')
+                                //     ->label('Keterangan')
+                                //     ->columnSpanFull(),
                             ]),
                     ]),
 

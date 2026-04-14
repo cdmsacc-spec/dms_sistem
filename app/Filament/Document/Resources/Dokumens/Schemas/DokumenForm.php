@@ -76,15 +76,22 @@ class DokumenForm
 
                                 Select::make('id_kapal')
                                     ->label('Nama Kapal')
+                                    ->preload()
                                     ->placeholder('')
                                     ->options(function (callable $get) {
-                                        $perusahaanId = $get('id_perusahaan');
                                         $jenisKapalId = $get('id_jenis_kapal');
-                                        return Kapal::query()
-                                            ->when($perusahaanId, fn($q) => $q->where('id_perusahaan', $perusahaanId))
-                                            ->when($jenisKapalId, fn($q) => $q->where('id_jenis_kapal', $jenisKapalId))
-                                            ->pluck('nama_kapal', 'id');
+                                        if (!$jenisKapalId) {
+                                            return JenisDokumen::pluck('nama_jenis', 'id');
+                                        }
+                                        $query = JenisDokumen::whereHas('jenisKapal', function ($q) use ($jenisKapalId) {
+                                            $q->where('id_jenis_kapal', $jenisKapalId);
+                                        });
+                                        if ($query->exists()) {
+                                            return $query->pluck('nama_jenis', 'id');
+                                        }
+                                        return JenisDokumen::pluck('nama_jenis', 'id');
                                     })
+                                    ->getOptionLabelUsing(fn($value): ?string => JenisDokumen::find($value)?->nama_jenis)
                                     ->getSearchResultsUsing(function (string $search, callable $get) {
                                         return Kapal::query()
                                             ->when($get('id_perusahaan'), fn($q) => $q->where('id_perusahaan', $get('id_perusahaan')))
@@ -132,6 +139,7 @@ class DokumenForm
                                         }
                                         return JenisDokumen::pluck('nama_jenis', 'id');
                                     })
+                                    ->getOptionLabelUsing(fn($value): ?string => JenisDokumen::find($value)?->nama_jenis)
                                     ->reactive()
                                     ->native(false)
                                     ->required(),

@@ -55,15 +55,9 @@ class DokumensTable
                 TextColumn::make('jenisDokumen.nama_jenis')
                     ->label('Jenis')
                     ->searchable(),
-                TextColumn::make('latestHistory.nomor_dokumen')
-                    ->label('Nomor Dokumen'),
-                TextColumn::make('status')
-                    ->badge()
-                    ->color(fn($state) => match ($state) {
-                        'uptodate'    => 'success',
-                        'near expiry' => 'warning',
-                        default       => 'danger',
-                    })->sortable(),
+                TextColumn::make('latestHistory.tanggal_expired')
+                    ->label('Tanggal Expired')
+                    ->date('d F Y'),
                 TextColumn::make('jarak_hari')
                     ->label('Jarak hari expired')
                     ->sortable()
@@ -72,6 +66,13 @@ class DokumensTable
                             ? $record->jarak_hari . ' hari'
                             : 'Tanpa Expired'
                     ),
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn($state) => match ($state) {
+                        'uptodate'    => 'success',
+                        'near expiry' => 'warning',
+                        default       => 'danger',
+                    })->sortable(),
                 TextColumn::make('last_comment')->html()
             ])
             ->filters([
