@@ -200,14 +200,24 @@ class DokumenForm
                     ->collapsible()
                     ->collapsed(false)
                     ->visible(function (callable $get, $livewire) {
-                        if (!($livewire instanceof \Filament\Resources\Pages\CreateRecord)) {
-                            return false;
+                        // CREATE
+                        if ($livewire instanceof \Filament\Resources\Pages\CreateRecord) {
+                            $fileDocs = $get('historyDokumen');
+
+                            return is_array($fileDocs) &&
+                                collect($fileDocs)->pluck('tanggal_expired')->filter()->isNotEmpty();
                         }
-                        $fileDocs = $get('historyDokumen');
-                        if (!is_array($fileDocs)) {
-                            return false;
+
+                        // EDIT
+                        if ($livewire instanceof \Filament\Resources\Pages\EditRecord) {
+                            $record = $livewire->record;
+
+                            return $record->historyDokumen()
+                                ->whereNotNull('tanggal_expired')
+                                ->exists();
                         }
-                        return collect($fileDocs)->pluck('tanggal_expired')->filter()->isNotEmpty();
+
+                        return false;
                     })
                     ->schema([
                         // ── Dropdown template dengan suffixAction tombol delete ─────────
