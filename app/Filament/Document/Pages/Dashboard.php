@@ -130,8 +130,9 @@ class Dashboard extends PagesDashboard
     public function getHeaderWidgets(): array
     {
         return [
-            AccountWidget::class,
-            DateWidget::class,
+            // AccountWidget::class,
+            // DateWidget::class,
+            DokumentNearExpired::class,
         ];
     }
 
@@ -148,12 +149,12 @@ class Dashboard extends PagesDashboard
         ];
     }
 
-    public function getFooterWidgets(): array
-    {
-        return [
-            DokumentNearExpired::class,
-        ];
-    }
+    // public function getFooterWidgets(): array
+    // {
+    //     return [
+    //         DokumentNearExpired::class,
+    //     ];
+    // }
 
     public function boot()
     {
