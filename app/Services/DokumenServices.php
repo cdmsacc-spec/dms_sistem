@@ -91,7 +91,7 @@ class DokumenServices
                 ['key' => '3', 'value' => 'url', 'value_text' => url("/document")],
             ];
             try {
-               //  SendWhatsAppNotificationJob::dispatchSync($wa, $info['nama'], $variables);
+                 SendWhatsAppNotificationJob::dispatchSync($wa, $info['nama'], $variables);
                 Log::info($info['nama'], $variables);
             } catch (\Throwable $th) {
                 Log::error(message: "Gagal dispatch WA ke $wa: " . $th->getMessage());
