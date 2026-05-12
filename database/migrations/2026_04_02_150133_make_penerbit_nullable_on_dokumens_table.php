@@ -12,8 +12,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('ALTER TABLE dokumens ALTER COLUMN penerbit TYPE TEXT');
-        DB::statement('ALTER TABLE dokumens ALTER COLUMN tempat_penerbitan TYPE TEXT');
+        DB::statement('ALTER TABLE dokumens ALTER COLUMN penerbit TYPE TEXT, ALTER COLUMN penerbit DROP NOT NULL');
+        DB::statement('ALTER TABLE dokumens ALTER COLUMN tempat_penerbitan TYPE TEXT, ALTER COLUMN tempat_penerbitan DROP NOT NULL');
     }
 
     /**

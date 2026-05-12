@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement('ALTER TABLE history_dokumens ALTER COLUMN nomor_dokumen TYPE TEXT');
+        DB::statement('ALTER TABLE history_dokumens ALTER COLUMN nomor_dokumen TYPE TEXT, ALTER COLUMN nomor_dokumen DROP NOT NULL');
     }
 
     public function down(): void
